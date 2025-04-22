@@ -3,12 +3,17 @@
   "name": "みんなのレシピ",
   "icons": [
     {
-      "src": "icons/icon-512.png?v=2",
+      "src": "icons/logo.png?v=2",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icons/logo.png?v=2",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "./?v=2",
   "display": "standalone",
   "theme_color": "#ffffff",
   "background_color": "#ffffff"
