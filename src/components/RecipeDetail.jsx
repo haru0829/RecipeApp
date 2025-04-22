@@ -4,13 +4,20 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import StairsIcon from "@mui/icons-material/Stairs";
 import PeopleIcon from "@mui/icons-material/People";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { recipes } from "../data/RecipeData";
 
 
-const RecipeDetail = () => {
+const RecipeDetail = ({setSelectedRecipe}) => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const recipe = recipes.find((r) => r.id === id);
+
+  const handleStart = () => {
+    setSelectedRecipe(recipe);
+    navigate("/");
+  }
 
   return (
     <div className="recipeDetail">
@@ -55,7 +62,7 @@ const RecipeDetail = () => {
           );
         })}
       </div>
-      <button className="startBtn">このレシピを始める</button>
+      <button className="startBtn" onClick={handleStart}>このレシピを始める</button>
     </div>
   );
 };
