@@ -3,7 +3,7 @@
   "name": "みんなのレシピ",
   "icons": [
     {
-      "src": "icons/icon-512.png",
+      "src": "icons/icon-512.png?v=2",
       "type": "image/png",
       "sizes": "512x512"
     }
