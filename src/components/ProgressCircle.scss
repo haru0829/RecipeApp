@@ -1,0 +1,9 @@
+.circle-container {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+}
+
+.circle-container circle {
+    transition: stroke-dashoffset .5s ease-out;
+}  
