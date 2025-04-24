@@ -6,9 +6,14 @@ import StairsIcon from "@mui/icons-material/Stairs";
 import PeopleIcon from "@mui/icons-material/People";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { recipes } from "../data/RecipeData";
+import { useEffect } from "react";
 
 
 const RecipeDetail = ({setSelectedRecipe}) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const { id } = useParams();
   const navigate = useNavigate();
 
