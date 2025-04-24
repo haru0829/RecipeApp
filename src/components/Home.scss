@@ -110,13 +110,15 @@ header {
 }
 
 .footerNav {
+  max-width: 500px;
   display: flex;
   width: 100%;
-  justify-content: space-around;
   background-color: #fafafa;
   padding: 8px 0 30px;
   position: fixed;
   bottom: 0;
+  left:50%;
+  transform: translateX(-50%);
 
   &Item {
     width: calc(100vw / 3);
