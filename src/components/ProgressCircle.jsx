@@ -28,7 +28,14 @@ const ProgressCircle = ({ outerPercent = 83, innerPercent = 43 }) => {
     <div className="circle-container">
       <svg width="160" height="160">
         {/* 外側背景 */}
-        <circle cx="80" cy="80" r={radius} stroke="#E5E7EB" strokeWidth={stroke} fill="none" />
+        <circle
+          cx="80"
+          cy="80"
+          r={radius}
+          stroke="#E5E7EB"
+          strokeWidth={stroke}
+          fill="none"
+        />
         {/* 外側進捗 */}
         <circle
           cx="80"
@@ -44,7 +51,14 @@ const ProgressCircle = ({ outerPercent = 83, innerPercent = 43 }) => {
         />
 
         {/* 内側背景 */}
-        <circle cx="80" cy="80" r={innerRadius} stroke="#E5E7EB" strokeWidth={stroke} fill="none" />
+        <circle
+          cx="80"
+          cy="80"
+          r={innerRadius}
+          stroke="#E5E7EB"
+          strokeWidth={stroke}
+          fill="none"
+        />
         {/* 内側進捗 */}
         <circle
           cx="80"
@@ -60,10 +74,25 @@ const ProgressCircle = ({ outerPercent = 83, innerPercent = 43 }) => {
         />
 
         {/* テキスト */}
-        <text x="80" y="80" textAnchor="middle" dy=".3em" fontSize="28" fill="#7C3AED" fontWeight="bold">
+        <text
+          x="80"
+          y="80"
+          textAnchor="middle"
+          dy=".3em"
+          fontSize="28"
+          fill="#7C3AED"
+          fontWeight="bold"
+        >
           {outerPercent}%
         </text>
-        <text x="80" y="110" textAnchor="middle" fontSize="16" fill="#14B8A6" fontWeight="bold">
+        <text
+          x="80"
+          y="110"
+          textAnchor="middle"
+          fontSize="16"
+          fill="#14B8A6"
+          fontWeight="bold"
+        >
           {innerPercent}%
         </text>
       </svg>

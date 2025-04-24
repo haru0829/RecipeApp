@@ -9,6 +9,7 @@ import { recipes } from "../data/RecipeData";
 import { useEffect } from "react";
 
 
+
 const RecipeDetail = ({setSelectedRecipe}) => {
   useEffect(() => {
     window.scrollTo(0, 0);
