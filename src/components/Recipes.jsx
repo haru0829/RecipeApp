@@ -20,7 +20,10 @@ const Recipes = () => {
           <input type="text" placeholder="レシピを検索" />
         </div>
         <div className="recipeInfo">
-          <p>214件</p>
+          <p class="count">
+            <span class="number">214</span>
+            <span class="unit">件</span>
+          </p>
           <div className="recipeSort">
             <SwapVertIcon />
             <p>新着順</p>
@@ -31,11 +34,7 @@ const Recipes = () => {
             {recipes.map((recipe) => (
               <li className="recipeItem" key={recipe.id}>
                 <Link to={`/recipe-detail/${recipe.id}`}>
-                  <img
-                    src={recipe.image}
-                    alt=""
-                    className="recipeItemImg"
-                  />
+                  <img src={recipe.image} alt="" className="recipeItemImg" />
                   <div className="recipeItemContent">
                     <p className="recipeItemTtl">{recipe.title}</p>
                     <p className="recipeItemPps">目的: {recipe.purpose}</p>
