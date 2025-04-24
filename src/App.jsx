@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Recipes from "./components/Recipes";
 import RecipeDetail from "./components/RecipeDetail";
 import { useState } from "react";
+import Profile from "./components/Profile";
 
 function App() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -16,6 +17,10 @@ function App() {
         <Route
           path="/recipe-detail/:id"
           element={<RecipeDetail setSelectedRecipe={setSelectedRecipe} />}
+        />
+        <Route
+          path="/profile/:id"
+          element={<Profile />}
         />
       </Routes>
     </Router>

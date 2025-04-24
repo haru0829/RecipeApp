@@ -4,6 +4,7 @@ import ProgressCircle from "./ProgressCircle";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Link } from "react-router-dom";
+import PersonIcon from '@mui/icons-material/Person';
 
 const Main = ({ selectedRecipe }) => {
   const hasRecipe =
@@ -132,6 +133,10 @@ const Main = ({ selectedRecipe }) => {
           <Link to="/recipes" className="footerNavItem">
             <DescriptionIcon />
             <p className="footerNavItemText">レシピ</p>
+          </Link>
+          <Link to="/profile/:id" className="footerNavItem">
+            <PersonIcon />
+            <p className="footerNavItemText">マイページ</p>
           </Link>
         </div>
       </footer>

@@ -1,11 +1,11 @@
 .recipeDetail {
-    max-width:500px;
-    margin:0 auto;
+  max-width: 500px;
+  margin: 0 auto;
 
   .header {
     position: relative;
   }
-  
+
   .back-btn {
     position: absolute;
     top: 30px;
@@ -28,19 +28,19 @@
     height: 340px;
     object-fit: cover;
   }
-  
+
   .content {
     padding: 16px;
     max-width: 500px;
     margin: 0 auto;
   }
-  
+
   .content h1 {
     font-size: 22px;
-    margin-bottom:8px;
+    margin-bottom: 8px;
     line-height: 30px;
   }
-  
+
   .meta {
     display: flex;
     align-items: center;
@@ -48,26 +48,26 @@
     font-size: 13px;
     margin-bottom: 10px;
   }
-  
+
   .desc {
     font-size: 14px;
     line-height: 1.6;
     margin-bottom: 20px;
   }
-  
-.steps {
+
+  .steps {
     display: flex;
     flex-direction: column;
     gap: 24px;
     padding: 0 16px 140px;
   }
-  
+
   .step {
     display: flex;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .stepper {
     display: flex;
     flex-direction: column;
@@ -75,11 +75,11 @@
     width: 40px;
     flex-shrink: 0;
   }
-  
+
   .stepper-circle {
     width: 40px;
     height: 40px;
-    background-color: #6C63FF;
+    background-color: #6c63ff;
     color: #fff;
     border-radius: 50%;
     font-weight: 700;
@@ -89,15 +89,15 @@
     z-index: 1;
   }
 
-//   .stepper-line {
-//     position: absolute;
-//     top: 0px;
-//     width: 2px;
-//     height: calc(100% - 20px);
-//     background-color: #ccc;
-//     z-index: 0;
-//   }
-  
+  //   .stepper-line {
+  //     position: absolute;
+  //     top: 0px;
+  //     width: 2px;
+  //     height: calc(100% - 20px);
+  //     background-color: #ccc;
+  //     z-index: 0;
+  //   }
+
   .step-content {
     background-color: white;
     padding: 12px;
@@ -106,36 +106,36 @@
     box-shadow: 0px 5px 15px -5px #777777;
     border-radius: 10px;
   }
-  
+
   .step-content h2 {
     font-size: 15px;
     margin-bottom: 8px;
   }
-  
+
   .step-content ul {
     padding-left: 20px;
     margin: 0 0 8px;
     font-size: 14px;
   }
-  
+
   .step-content p {
     font-size: 13px;
     margin: 4px 0;
   }
-  
+
   .startBtn {
     padding: 12px 24px;
-    background-color: #6C63FF;
+    width: 200px;
+    background-color: #6c63ff;
     color: #fff;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     position: fixed;
-    bottom:36px;
-    left:50%;
+    bottom: 36px;
+    left: 50%;
     transform: translateX(-50%);
-    font-size:16px;
+    font-size: 16px;
     font-weight: 700;
   }
-  
 }
