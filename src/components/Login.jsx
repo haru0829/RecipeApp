@@ -16,7 +16,7 @@ const Login = ({ setIsAuth }) => {
       <div className="container">
         <img src="/images/recipeLogo.png" alt="" className="loginImg" />
         <div className="loginContainer">
-          <button className="googleLoginBtn">
+          <button className="googleLoginBtn" onClick={loginInWithGoogle}>
             <GoogleIcon className="googleIcon" />
             Googleでログイン
           </button>
