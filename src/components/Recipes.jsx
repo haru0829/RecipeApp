@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Recipes.scss";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
@@ -10,6 +10,10 @@ import PersonIcon from "@mui/icons-material/Person";
 // import SearchIcon from '@mui/icons-material/Search';
 
 const Recipes = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="recipes">
       <header>
@@ -45,14 +49,17 @@ const Recipes = () => {
                       ))}
                     </p>
                     <div className="recipeItemInfo">
-                      <div className="userInfo">
-                        <img
-                          className="userIcon"
-                          src="/images/userIcon.png"
-                          alt="プロフィール画像"
-                        />
-                        <h2 className="userName">リョウ</h2>
-                      </div>
+                      <Link to="/profile/:id">
+                        <div className="userInfo">
+                          <img
+                            className="userIcon"
+                            src="/images/userIcon.png"
+                            alt="プロフィール画像"
+                          />
+                          <h2 className="userName">リョウ</h2>
+                        </div>
+                      </Link>
+
                       <p className="recipeStar">★ 4.7</p>
                     </div>
                   </div>

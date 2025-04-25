@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Profile.scss";
 import { Link } from "react-router-dom";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
@@ -6,6 +6,10 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import PersonIcon from '@mui/icons-material/Person';
 
 const Profile = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="profile">
       <header>
