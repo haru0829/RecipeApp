@@ -15,6 +15,7 @@ const Login = ({ setIsAuth }) => {
   const navigate = useNavigate();
 
   const loginWithGoogle = () => {
+    console.log("click!")
     signInWithRedirect(auth, provider);
   };
 
