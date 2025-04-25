@@ -1,20 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Recipes.scss";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Link } from "react-router-dom";
-import { recipes } from "../data/RecipeData";
 import PersonIcon from "@mui/icons-material/Person";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 const Recipes = () => {
+  const [recipes, setRecipes] = useState([]); // 🔸 レシピを保存するステート
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     const getRecipes = async () => {
-      const data = await getDocs(collection(db, "recipe"));
-      console.log(data);
+      const snapshot = await getDocs(collection(db, "recipes")); // ← 'recipe' → 'recipes' に合わせる
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setRecipes(data);
+      setLoading(false);
     };
     getRecipes();
   }, []);
@@ -24,13 +31,15 @@ const Recipes = () => {
       <header>
         <h1>みんなのレシピ</h1>
       </header>
+
       <div className="recipeContainer">
         <div className="recipeSearch">
           <input type="text" placeholder="レシピを検索" />
         </div>
+
         <div className="recipeInfo">
           <p className="count">
-            <span className="number">214</span>
+            <span className="number">{recipes.length}</span>
             <span className="unit">件</span>
           </p>
           <div className="recipeSort">
@@ -38,44 +47,55 @@ const Recipes = () => {
             <p>新着順</p>
           </div>
         </div>
-        <div className="recipeList">
-          <ul>
-            {recipes.map((recipe) => (
-              <li className="recipeItem" key={recipe.id}>
-                <div className="recipeItemWrapper">
-                  <Link to={`/recipe-detail/${recipe.id}`}>
-                    <img src={recipe.image} alt="" className="recipeItemImg" />
-                    <div className="recipeItemContent">
-                      <p className="recipeItemTtl">{recipe.title}</p>
-                      <p className="recipeItemPps">目的: {recipe.purpose}</p>
-                      <p className="recipeItemTime">期間: {recipe.duration}</p>
-                      <p className="recipeItemTag">
-                        {recipe.tag.map((t, index) => (
-                          <span key={index}>#{t} </span>
-                        ))}
-                      </p>
-                    </div>
-                  </Link>
 
-                  <div className="recipeItemInfo">
-                    <Link to="/profile/:id" className="userLink">
-                      <div className="userInfo">
-                        <img
-                          className="userIcon"
-                          src="/images/userIcon.png"
-                          alt="プロフィール画像"
-                        />
-                        <h2 className="userName">リョウ</h2>
+        <div className="recipeList">
+          {loading ? (
+            <p>レシピを読み込んでいます...</p>
+          ) : (
+            <ul>
+              {recipes.map((recipe) => (
+                <li className="recipeItem" key={recipe.id}>
+                  <div className="recipeItemWrapper">
+                    <Link to={`/recipe-detail/${recipe.id}`}>
+                      <img
+                        src={recipe.image}
+                        alt=""
+                        className="recipeItemImg"
+                      />
+                      <div className="recipeItemContent">
+                        <p className="recipeItemTtl">{recipe.title}</p>
+                        <p className="recipeItemPps">目的: {recipe.purpose}</p>
+                        <p className="recipeItemTime">期間: {recipe.duration}</p>
+                        <p className="recipeItemTag">
+                          {recipe.tag &&
+                            recipe.tag.map((t, index) => (
+                              <span key={index}>#{t} </span>
+                            ))}
+                        </p>
                       </div>
                     </Link>
-                    <p className="recipeStar">★ 4.7</p>
+
+                    <div className="recipeItemInfo">
+                      <Link to="/profile/:id" className="userLink">
+                        <div className="userInfo">
+                          <img
+                            className="userIcon"
+                            src="/images/userIcon.png"
+                            alt="プロフィール画像"
+                          />
+                          <h2 className="userName">リョウ</h2>
+                        </div>
+                      </Link>
+                      <p className="recipeStar">★ 4.7</p>
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
+
       <footer>
         <div className="footerNav">
           <Link to="/" className="footerNavItem">

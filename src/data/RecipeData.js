@@ -2,7 +2,6 @@
 export const recipes = [
   {
     image: "/images/guitar.png",
-    id: "1",
     title: "ギターで簡単なコードを弾けるようになって一曲弾いてみよう",
     purpose: "1曲を弾けるようになる",
     duration: "2週間",
@@ -54,7 +53,6 @@ export const recipes = [
   },
   {
     image: "/images/english.png",
-    id: "2",
     title: "英語で日常会話をしてみよう",
     purpose: "英語で日常会話ができるようになる",
     duration: "2週間",
@@ -110,7 +108,6 @@ export const recipes = [
   },
   {
     image: "/images/unsplash_lb-YKV95gsg.png",
-    id: "3",
     title: "毎日の簡単ワークアウト習慣",
     purpose: "運動習慣を身につける",
     duration: "2週間",
@@ -154,7 +151,6 @@ export const recipes = [
   },
   {
     image: "/images/unsplash_ZpJVNofpg7c.png",
-    id: "4",
     title: "自炊初心者でも作れる簡単ごはん",
     purpose: "自炊力の基本を身につける",
     duration: "1週間",
@@ -198,7 +194,6 @@ export const recipes = [
   },
   {
     image: "/images/code.png",
-    id: "5",
     title: "全くの初心者でもOK！2週間でWebサイトをつくって公開しよう",
     purpose:
       "自分でHTML/CSSを書いて、GitHub PagesなどでWebサイトを公開できるようになる",

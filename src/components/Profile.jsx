@@ -3,9 +3,12 @@ import "./Profile.scss";
 import { Link } from "react-router-dom";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
-import PersonIcon from '@mui/icons-material/Person';
+import PersonIcon from "@mui/icons-material/Person";
+import { auth } from "../firebase";
 
 const Profile = () => {
+  const user = auth.currentUser;
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -13,16 +16,16 @@ const Profile = () => {
   return (
     <div className="profile">
       <header>
-        <h1>@ryo_guitar</h1>
+        <h1>@{user.displayName}</h1>
       </header>
       <div className="profileContainer">
         <div className="profileInfo">
           <img
             className="profileIcon"
-            src="/images/userIcon.png"
+            src={user.photoURL}
             alt="プロフィール画像"
           />
-          <h2 className="profileName">リョウ</h2>
+          <h2 className="profileName">{user.displayName}</h2>
         </div>
         <div className="profileStatsCard">
           <div className="profileStatsItem">

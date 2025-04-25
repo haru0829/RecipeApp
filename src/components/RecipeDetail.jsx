@@ -1,33 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./RecipeDetail.scss";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import StairsIcon from "@mui/icons-material/Stairs";
 import PeopleIcon from "@mui/icons-material/People";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { recipes } from "../data/RecipeData";
-import { useEffect } from "react";
-import { updateDoc, doc } from "firebase/firestore";
+import { updateDoc, doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const RecipeDetail = ({ setSelectedRecipe }) => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const recipe = recipes.find((r) => r.id === id);
+  const [recipe, setRecipe] = useState(null);
 
-  const handleStart = () => {
-    setSelectedRecipe(recipe);
-    navigate("/");
-  };
+  // Firestoreから1件のレシピを取得
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const fetchRecipe = async () => {
+      const docRef = doc(db, "recipes", id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setRecipe({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        console.error("❌ レシピが見つかりません");
+      }
+    };
+
+    fetchRecipe();
+  }, [id]);
 
   const saveSelectedRecipeId = async (recipeId) => {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user || !recipe) return;
 
     const userRef = doc(db, "users", user.uid);
     await updateDoc(userRef, {
@@ -38,6 +43,13 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
       },
     });
   };
+
+  const handleStart = () => {
+    setSelectedRecipe(recipe);
+    navigate("/");
+  };
+
+  if (!recipe) return <div>読み込み中...</div>;
 
   return (
     <div className="recipeDetail">
@@ -62,31 +74,30 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
       </div>
 
       <div className="steps">
-        {recipe.steps.map((step, index) => {
-          return (
-            <div className="step">
-              <div className="stepper">
-                <div className="stepper-circle">{index + 1}</div>
-                <div className="stepper-line"></div>
-              </div>
-              <div className="step-content">
-                <h2>{step.title}</h2>
-                <ul>
-                  {step.tasks.map((task) => (
-                    <li>{task}</li>
-                  ))}
-                </ul>
-                <p>{step.point}</p>
-              </div>
+        {recipe.steps.map((step, index) => (
+          <div className="step" key={index}>
+            <div className="stepper">
+              <div className="stepper-circle">{index + 1}</div>
+              <div className="stepper-line"></div>
             </div>
-          );
-        })}
+            <div className="step-content">
+              <h2>{step.title}</h2>
+              <ul>
+                {step.tasks.map((task, i) => (
+                  <li key={i}>{task}</li>
+                ))}
+              </ul>
+              <p>{step.point}</p>
+            </div>
+          </div>
+        ))}
       </div>
+
       <button
         className="startBtn"
         onClick={async () => {
-          await saveSelectedRecipeId(recipe.id); // 🔄 Firestoreに保存が先
-          handleStart(); // 🔽 その後で状態更新して遷移
+          await saveSelectedRecipeId(recipe.id);
+          handleStart();
         }}
       >
         このレシピを始める

@@ -14,6 +14,7 @@ import Main from "./components/Home";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
+import UploadRecipes from "./UploadRecipes";
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -26,21 +27,21 @@ function App() {
       if (user) {
         setIsAuth(true);
         localStorage.setItem("isAuth", "true");
-  
+
         // ✅ ユーザー切替時に明示的に前のデータをリセット
         setSelectedRecipe(null);
         setInitialProgress(null);
-  
+
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) {
           setLoading(false);
           return;
         }
-  
+
         const userData = userSnap.data();
         const recipeId = userData.selectedRecipeId;
-  
+
         if (recipeId) {
           const recipeRef = doc(db, "recipes", recipeId);
           const recipeSnap = await getDoc(recipeRef);
@@ -54,17 +55,17 @@ function App() {
       } else {
         setIsAuth(false);
         localStorage.removeItem("isAuth");
-  
+
         // ✅ ログアウト時にも念のためリセット
         setSelectedRecipe(null);
         setInitialProgress(null);
       }
       setLoading(false);
     });
-  
+
     return () => unsubscribe();
   }, []);
-  
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -74,12 +75,12 @@ function App() {
           path="/"
           element={
             isAuth ? (
-                <Main
-                  selectedRecipe={selectedRecipe}
-                  isAuth={isAuth}
-                  initialProgress={initialProgress}
-                />
-              ) : (
+              <Main
+                selectedRecipe={selectedRecipe}
+                isAuth={isAuth}
+                initialProgress={initialProgress}
+              />
+            ) : (
               <Navigate to="/login" replace />
             )
           }
