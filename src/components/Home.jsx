@@ -1,12 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Home.scss";
 import ProgressCircle from "./ProgressCircle";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Link } from "react-router-dom";
-import PersonIcon from '@mui/icons-material/Person';
+import PersonIcon from "@mui/icons-material/Person";
+import { addRecipeToFirestore } from "../AddRecipe";
 
 const Main = ({ selectedRecipe }) => {
+  const hasAdded = useRef(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (!hasAdded.current) {
+      addRecipeToFirestore();
+      hasAdded.current = true;
+    }
+  }, []);
+
   const hasRecipe =
     selectedRecipe &&
     Array.isArray(selectedRecipe.steps) &&

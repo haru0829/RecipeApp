@@ -6,12 +6,17 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { Link } from "react-router-dom";
 import { recipes } from "../data/RecipeData";
 import PersonIcon from "@mui/icons-material/Person";
-
-// import SearchIcon from '@mui/icons-material/Search';
+import { db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const Recipes = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
+    const getRecipes = async () => {
+      const data = await getDocs(collection(db, "recipe"));
+      console.log(data);
+    };
+    getRecipes();
   }, []);
 
   return (
@@ -24,9 +29,9 @@ const Recipes = () => {
           <input type="text" placeholder="レシピを検索" />
         </div>
         <div className="recipeInfo">
-          <p class="count">
-            <span class="number">214</span>
-            <span class="unit">件</span>
+          <p className="count">
+            <span className="number">214</span>
+            <span className="unit">件</span>
           </p>
           <div className="recipeSort">
             <SwapVertIcon />
@@ -37,33 +42,35 @@ const Recipes = () => {
           <ul>
             {recipes.map((recipe) => (
               <li className="recipeItem" key={recipe.id}>
-                <Link to={`/recipe-detail/${recipe.id}`}>
-                  <img src={recipe.image} alt="" className="recipeItemImg" />
-                  <div className="recipeItemContent">
-                    <p className="recipeItemTtl">{recipe.title}</p>
-                    <p className="recipeItemPps">目的: {recipe.purpose}</p>
-                    <p className="recipeItemTime">期間: {recipe.duration}</p>
-                    <p className="recipeItemTag">
-                      {recipe.tag.map((t, index) => (
-                        <span key={index}>#{t} </span>
-                      ))}
-                    </p>
-                    <div className="recipeItemInfo">
-                      <Link to="/profile/:id">
-                        <div className="userInfo">
-                          <img
-                            className="userIcon"
-                            src="/images/userIcon.png"
-                            alt="プロフィール画像"
-                          />
-                          <h2 className="userName">リョウ</h2>
-                        </div>
-                      </Link>
-
-                      <p className="recipeStar">★ 4.7</p>
+                <div className="recipeItemWrapper">
+                  <Link to={`/recipe-detail/${recipe.id}`}>
+                    <img src={recipe.image} alt="" className="recipeItemImg" />
+                    <div className="recipeItemContent">
+                      <p className="recipeItemTtl">{recipe.title}</p>
+                      <p className="recipeItemPps">目的: {recipe.purpose}</p>
+                      <p className="recipeItemTime">期間: {recipe.duration}</p>
+                      <p className="recipeItemTag">
+                        {recipe.tag.map((t, index) => (
+                          <span key={index}>#{t} </span>
+                        ))}
+                      </p>
                     </div>
+                  </Link>
+
+                  <div className="recipeItemInfo">
+                    <Link to="/profile/:id" className="userLink">
+                      <div className="userInfo">
+                        <img
+                          className="userIcon"
+                          src="/images/userIcon.png"
+                          alt="プロフィール画像"
+                        />
+                        <h2 className="userName">リョウ</h2>
+                      </div>
+                    </Link>
+                    <p className="recipeStar">★ 4.7</p>
                   </div>
-                </Link>
+                </div>
               </li>
             ))}
           </ul>

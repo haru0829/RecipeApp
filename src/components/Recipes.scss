@@ -102,10 +102,10 @@ header {
       }
 
       &Info {
-        margin-top: 8px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 0 20px 16px;
 
         .userInfo {
           display: flex;

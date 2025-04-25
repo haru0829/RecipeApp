@@ -5,8 +5,11 @@ import Recipes from "./components/Recipes";
 import RecipeDetail from "./components/RecipeDetail";
 import { useState } from "react";
 import Profile from "./components/Profile";
+import Login from "./components/Login";
+
 
 function App() {
+  const [isAuth,setIsAuth] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   return (
@@ -18,10 +21,8 @@ function App() {
           path="/recipe-detail/:id"
           element={<RecipeDetail setSelectedRecipe={setSelectedRecipe} />}
         />
-        <Route
-          path="/profile/:id"
-          element={<Profile />}
-        />
+        <Route path="/profile/:id" element={<Profile />} />
+        <Route path="/login" element={<Login setIsAuth={setIsAuth}/>} />
       </Routes>
     </Router>
   );
