@@ -5,17 +5,16 @@ import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Link, useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
+import { updateDoc, doc } from "firebase/firestore";
+import { auth, db } from "../firebase";
+import { addRecipeToFirestore } from "../AddRecipe";
 
-const Main = ({ selectedRecipe, isAuth }) => {
+const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
+  useEffect(() => {
+    console.log("selectedRecipe:", selectedRecipe);
+  }, [selectedRecipe]);
   const hasAdded = useRef(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (!isAuth) {
-      navigate("/login");
-    }
-  }, [isAuth, navigate]);
 
   const hasRecipe =
     selectedRecipe &&
@@ -24,6 +23,29 @@ const Main = ({ selectedRecipe, isAuth }) => {
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [todayTasks, setTodayTasks] = useState([]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // addRecipeToFirestore();
+    if (!isAuth) {
+      navigate("/login");
+    }
+  }, [isAuth, navigate]);
+
+  useEffect(() => {
+    if (hasRecipe) {
+      const progress = initialProgress || {};
+      const stepIndex = progress.currentStep || 0;
+      setCurrentStepIndex(stepIndex);
+
+      const stepTasks = selectedRecipe.steps[stepIndex].tasks.map((t, i) => ({
+        title: t,
+        done: progress.taskStates ? progress.taskStates[i] : false,
+      }));
+
+      setTodayTasks(stepTasks);
+    }
+  }, [hasRecipe, selectedRecipe, initialProgress]);
 
   const currentStep = hasRecipe
     ? selectedRecipe.steps[currentStepIndex]
@@ -42,21 +64,44 @@ const Main = ({ selectedRecipe, isAuth }) => {
     ? 100
     : Math.floor((currentStepIndex / selectedRecipe.steps.length) * 100);
 
+  const saveProgress = async (recipeId, stepIndex, taskStates) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userRef = doc(db, "users", user.uid);
+    await updateDoc(userRef, {
+      [`progress.${recipeId}`]: {
+        currentStep: stepIndex,
+        taskStates: taskStates,
+      },
+    });
+  };
+
   const handleToggle = (index) => {
     const updated = [...todayTasks];
     updated[index].done = !updated[index].done;
     setTodayTasks(updated);
+    saveProgress(
+      selectedRecipe.id,
+      currentStepIndex,
+      updated.map((t) => t.done)
+    );
   };
 
   useEffect(() => {
-    if (hasRecipe) {
-      const tasks = selectedRecipe.steps[currentStepIndex].tasks.map((t) => ({
-        title: t,
-        done: false,
-      }));
-      setTodayTasks(tasks);
-    }
-  }, [hasRecipe, currentStepIndex, selectedRecipe]);
+    if (!hasRecipe || initialProgress) return;
+
+    const tasks = selectedRecipe.steps[currentStepIndex].tasks.map((t) => ({
+      title: t,
+      done: false,
+    }));
+    setTodayTasks(tasks);
+    saveProgress(
+      selectedRecipe.id,
+      currentStepIndex,
+      tasks.map((t) => t.done)
+    );
+  }, [hasRecipe, currentStepIndex, selectedRecipe, initialProgress]);
 
   useEffect(() => {
     if (!hasRecipe) return;
@@ -69,11 +114,18 @@ const Main = ({ selectedRecipe, isAuth }) => {
         const nextStepIndex = currentStepIndex + 1;
         setCurrentStepIndex(nextStepIndex);
 
-        const nextTasks = selectedRecipe.steps[nextStepIndex].tasks.map((t) => ({
-          title: t,
-          done: false,
-        }));
+        const nextTasks = selectedRecipe.steps[nextStepIndex].tasks.map(
+          (t) => ({
+            title: t,
+            done: false,
+          })
+        );
         setTodayTasks(nextTasks);
+        saveProgress(
+          selectedRecipe.id,
+          nextStepIndex,
+          nextTasks.map((t) => t.done)
+        );
       }, 800);
     }
   }, [todayTasks, currentStepIndex, selectedRecipe, hasRecipe]);

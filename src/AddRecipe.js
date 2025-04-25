@@ -4,7 +4,7 @@ import { collection, addDoc } from "firebase/firestore";
 
 const recipe = {
   image: "/images/code.png",
-  id: "7",
+  id: "5",
   title: "全くの初心者でもOK！2週間でWebサイトをつくって公開しよう",
   purpose:
     "自分でHTML/CSSを書いて、GitHub PagesなどでWebサイトを公開できるようになる",

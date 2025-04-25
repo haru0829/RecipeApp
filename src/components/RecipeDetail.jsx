@@ -7,10 +7,10 @@ import PeopleIcon from "@mui/icons-material/People";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { recipes } from "../data/RecipeData";
 import { useEffect } from "react";
+import { updateDoc, doc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
-
-
-const RecipeDetail = ({setSelectedRecipe}) => {
+const RecipeDetail = ({ setSelectedRecipe }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -23,7 +23,17 @@ const RecipeDetail = ({setSelectedRecipe}) => {
   const handleStart = () => {
     setSelectedRecipe(recipe);
     navigate("/");
-  }
+  };
+
+  const saveSelectedRecipeId = async (recipeId) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userRef = doc(db, "users", user.uid);
+    await updateDoc(userRef, {
+      selectedRecipeId: recipeId,
+    });
+  };
 
   return (
     <div className="recipeDetail">
@@ -68,7 +78,15 @@ const RecipeDetail = ({setSelectedRecipe}) => {
           );
         })}
       </div>
-      <button className="startBtn" onClick={handleStart}>このレシピを始める</button>
+      <button
+        className="startBtn"
+        onClick={() => {
+          handleStart(); 
+          saveSelectedRecipeId(recipe.id);
+        }}
+      >
+        このレシピを始める
+      </button>
     </div>
   );
 };
