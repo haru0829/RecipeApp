@@ -63,16 +63,12 @@ function App() {
           path="/"
           element={
             isAuth ? (
-              selectedRecipe ? (
                 <Main
                   selectedRecipe={selectedRecipe}
                   isAuth={isAuth}
                   initialProgress={initialProgress}
                 />
               ) : (
-                <div>レシピを読み込んでいます...</div> // 読み込み中表示
-              )
-            ) : (
               <Navigate to="/login" replace />
             )
           }
