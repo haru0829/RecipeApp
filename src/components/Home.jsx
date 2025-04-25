@@ -155,13 +155,13 @@ const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
           </>
         )}
 
-        <div className="homeStreak">
+        {/* <div className="homeStreak">
           <p className="homeStreakTag">連続継続日数</p>
           <div className="homeStreakVisual">
             <img src="fire.png" alt="streak" />
             <p className="homeStreakDate">10日</p>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <footer>
