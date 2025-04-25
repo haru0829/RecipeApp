@@ -32,6 +32,10 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
     const userRef = doc(db, "users", user.uid);
     await updateDoc(userRef, {
       selectedRecipeId: recipeId,
+      progress: {
+        currentStep: 0,
+        taskStates: recipe.steps[0].tasks.map(() => false),
+      },
     });
   };
 
@@ -80,9 +84,9 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
       </div>
       <button
         className="startBtn"
-        onClick={() => {
-          handleStart(); 
-          saveSelectedRecipeId(recipe.id);
+        onClick={async () => {
+          await saveSelectedRecipeId(recipe.id); // 🔄 Firestoreに保存が先
+          handleStart(); // 🔽 その後で状態更新して遷移
         }}
       >
         このレシピを始める
