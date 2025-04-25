@@ -2,6 +2,7 @@ import React from "react";
 import "./Login.scss";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../firebase";
+import GoogleIcon from "@mui/icons-material/Google"; // MUIアイコン（任意）
 
 const Login = ({ setIsAuth }) => {
   const loginInWithGoogle = () => {
@@ -12,9 +13,14 @@ const Login = ({ setIsAuth }) => {
   };
   return (
     <div className="login">
-      <div className="loginContainer">
-        <img src="/images/recipeLogo.png" alt="" className="loginImg"/>
-        <button className="loginBtn" onClick={loginInWithGoogle}>Googleでログイン</button>
+      <div className="container">
+        <img src="/images/recipeLogo.png" alt="" className="loginImg" />
+        <div className="loginContainer">
+          <button className="googleLoginBtn">
+            <GoogleIcon className="googleIcon" />
+            Googleでログイン
+          </button>
+        </div>
       </div>
     </div>
   );
