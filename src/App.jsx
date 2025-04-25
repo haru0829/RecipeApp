@@ -1,20 +1,24 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebase";
-
-import Home from "./components/Home";
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Recipes from "./components/Recipes";
 import RecipeDetail from "./components/RecipeDetail";
 import Profile from "./components/Profile";
 import Login from "./components/Login";
+import Main from "./components/Home"; // ← Home.jsx は Main を export しているのでここを修正
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [loading, setLoading] = useState(true); // 初期状態を保つためのフラグ
+  const [loading, setLoading] = useState(true);
 
-  // ✅ Firebase認証状態を監視
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -24,13 +28,12 @@ function App() {
         setIsAuth(false);
         localStorage.removeItem("isAuth");
       }
-      setLoading(false); // 認証チェック完了
+      setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
-  if (loading) return <div>Loading...</div>; // 認証状態のチェック中に一時表示
+  if (loading) return <div>Loading...</div>;
 
   return (
     <Router>
@@ -39,7 +42,7 @@ function App() {
           path="/"
           element={
             isAuth ? (
-              <Home selectedRecipe={selectedRecipe} />
+              <Main selectedRecipe={selectedRecipe} isAuth={isAuth} />
             ) : (
               <Navigate to="/login" replace />
             )

@@ -3,20 +3,19 @@ import "./Home.scss";
 import ProgressCircle from "./ProgressCircle";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
-import { addRecipeToFirestore } from "../AddRecipe";
 
-const Main = ({ selectedRecipe }) => {
+const Main = ({ selectedRecipe, isAuth }) => {
   const hasAdded = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (!hasAdded.current) {
-      addRecipeToFirestore();
-      hasAdded.current = true;
+    if (!isAuth) {
+      navigate("/login");
     }
-  }, []);
+  }, [isAuth, navigate]);
 
   const hasRecipe =
     selectedRecipe &&
@@ -26,18 +25,15 @@ const Main = ({ selectedRecipe }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [todayTasks, setTodayTasks] = useState([]);
 
-  // 現在のステップ
   const currentStep = hasRecipe
     ? selectedRecipe.steps[currentStepIndex]
     : { title: "", tasks: [] };
 
-  // 本日の進捗
   const totalTasks = currentStep.tasks.length;
   const doneTasks = todayTasks.filter((t) => t.done).length;
   const innerPercent =
     totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
 
-  // 全体進捗（100%対応）
   const isLastStep = currentStepIndex === selectedRecipe?.steps?.length - 1;
   const allDone = todayTasks.every((t) => t.done);
   const outerPercent = !hasRecipe
@@ -52,7 +48,6 @@ const Main = ({ selectedRecipe }) => {
     setTodayTasks(updated);
   };
 
-  // 初期化またはステップ更新時に todayTasks を設定
   useEffect(() => {
     if (hasRecipe) {
       const tasks = selectedRecipe.steps[currentStepIndex].tasks.map((t) => ({
@@ -63,7 +58,6 @@ const Main = ({ selectedRecipe }) => {
     }
   }, [hasRecipe, currentStepIndex, selectedRecipe]);
 
-  // 全部完了したら自動で次へ
   useEffect(() => {
     if (!hasRecipe) return;
 
@@ -75,12 +69,10 @@ const Main = ({ selectedRecipe }) => {
         const nextStepIndex = currentStepIndex + 1;
         setCurrentStepIndex(nextStepIndex);
 
-        const nextTasks = selectedRecipe.steps[nextStepIndex].tasks.map(
-          (t) => ({
-            title: t,
-            done: false,
-          })
-        );
+        const nextTasks = selectedRecipe.steps[nextStepIndex].tasks.map((t) => ({
+          title: t,
+          done: false,
+        }));
         setTodayTasks(nextTasks);
       }, 800);
     }
@@ -133,9 +125,6 @@ const Main = ({ selectedRecipe }) => {
             <p className="homeStreakDate">10日</p>
           </div>
         </div>
-        <Link to="/login">
-          <h2>ログイン</h2>
-        </Link>
       </div>
 
       <footer>
