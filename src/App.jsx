@@ -48,8 +48,9 @@ function App() {
           if (recipeSnap.exists()) {
             setSelectedRecipe({ id: recipeId, ...recipeSnap.data() });
             if (userData.progress && userData.progress[recipeId]) {
-              setInitialProgress(userData.progress[recipeId]);
+              setInitialProgress(userData.progress); // ← recipeIdで管理されてる
             }
+            
           }
         }
       } else {

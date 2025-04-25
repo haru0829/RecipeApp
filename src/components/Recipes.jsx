@@ -9,13 +9,14 @@ import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 const Recipes = () => {
-  const [recipes, setRecipes] = useState([]); // 🔸 レシピを保存するステート
+  const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortType, setSortType] = useState("new"); // 'new' または 'popular'
 
   useEffect(() => {
     window.scrollTo(0, 0);
     const getRecipes = async () => {
-      const snapshot = await getDocs(collection(db, "recipes")); // ← 'recipe' → 'recipes' に合わせる
+      const snapshot = await getDocs(collection(db, "recipes"));
       const data = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -25,6 +26,16 @@ const Recipes = () => {
     };
     getRecipes();
   }, []);
+
+  // 🔽 並び替え処理
+  const sortedRecipes = [...recipes].sort((a, b) => {
+    if (sortType === "new") {
+      return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+    } else if (sortType === "popular") {
+      return (parseInt(b.people) || 0) - (parseInt(a.people) || 0);
+    }
+    return 0;
+  });
 
   return (
     <div className="recipes">
@@ -42,9 +53,19 @@ const Recipes = () => {
             <span className="number">{recipes.length}</span>
             <span className="unit">件</span>
           </p>
-          <div className="recipeSort">
-            <SwapVertIcon />
-            <p>新着順</p>
+          <div className="recipeSortButtons">
+            <button
+              className={`sortBtn ${sortType === "newest" ? "active" : ""}`}
+              onClick={() => setSortType("newest")}
+            >
+              新着順
+            </button>
+            <button
+              className={`sortBtn ${sortType === "popular" ? "active" : ""}`}
+              onClick={() => setSortType("popular")}
+            >
+              人気順
+            </button>
           </div>
         </div>
 
@@ -53,7 +74,7 @@ const Recipes = () => {
             <p>レシピを読み込んでいます...</p>
           ) : (
             <ul>
-              {recipes.map((recipe) => (
+              {sortedRecipes.map((recipe) => (
                 <li className="recipeItem" key={recipe.id}>
                   <div className="recipeItemWrapper">
                     <Link to={`/recipe-detail/${recipe.id}`}>
@@ -65,7 +86,9 @@ const Recipes = () => {
                       <div className="recipeItemContent">
                         <p className="recipeItemTtl">{recipe.title}</p>
                         <p className="recipeItemPps">目的: {recipe.purpose}</p>
-                        <p className="recipeItemTime">期間: {recipe.duration}</p>
+                        <p className="recipeItemTime">
+                          期間: {recipe.duration}
+                        </p>
                         <p className="recipeItemTag">
                           {recipe.tag &&
                             recipe.tag.map((t, index) => (

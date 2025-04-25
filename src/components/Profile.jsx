@@ -27,7 +27,7 @@ const Profile = () => {
           />
           <h2 className="profileName">{user.displayName}</h2>
         </div>
-        <div className="profileStatsCard">
+        {/* <div className="profileStatsCard">
           <div className="profileStatsItem">
             <p className="profileStatsLabel">レシピ評価</p>
             <p className="profileStatsValue">★ 4.7</p>
@@ -36,7 +36,7 @@ const Profile = () => {
             <p className="profileStatsLabel">達成ユーザー数</p>
             <p className="profileStatsValue">1,200人</p>
           </div>
-        </div>
+        </div> */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">経歴・実績</h3>
           <ul className="profileCareerList">
@@ -55,7 +55,7 @@ const Profile = () => {
           </div>
         </section>
 
-        <section className="profileSection">
+        {/* <section className="profileSection">
           <h3 className="profileSectionTitle">作成したレシピ</h3>
 
           <ul>
@@ -80,7 +80,7 @@ const Profile = () => {
               </p>
             </li>
           </ul>
-        </section>
+        </section> */}
 
         <section className="profileSection">
           <h3 className="profileSectionTitle">自己紹介</h3>

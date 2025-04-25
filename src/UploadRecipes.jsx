@@ -3,6 +3,7 @@
 // import { db } from "./firebase";
 // import { collection, setDoc, doc } from "firebase/firestore";
 // import { recipes } from "./data/RecipeData"; // 必ずidを含まないようにする
+// import { serverTimestamp } from "firebase/firestore";
 
 // const uploadAllRecipes = async () => {
 //   const recipeCollection = collection(db, "recipes");
@@ -14,6 +15,7 @@
 //     const recipe = {
 //       ...original,
 //       id: newId, // 自動生成IDをレシピ内に保存
+//       createdAt: serverTimestamp(), // ← 🔥 自動でFirestoreのサーバー時刻を記録
 //     };
 
 //     await setDoc(ref, recipe);

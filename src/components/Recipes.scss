@@ -42,27 +42,47 @@ header {
 
   .recipeInfo {
     display: flex;
+    align-items: center; // ← 高さをそろえる
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-
+    margin-bottom: 16px;
+  
     .count {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+  
       .number {
-        font-size: 18px;
-        font-weight: 700;
-      }
-      .unit {
-        font-size: 12px;
+        font-weight: bold;
+        margin-right: 4px;
       }
     }
-
-    .recipeSort {
+  
+    .recipeSortButtons {
       display: flex;
-      flex-direction: row;
-      align-items: center;
-      font-size: 14px;
+      gap: 8px;
+  
+      .sortBtn {
+        padding: 6px 12px;
+        font-size: 14px;
+        border: none;
+        border-radius: 20px;
+        background-color: #eee;
+        cursor: pointer;
+        transition: all 0.2s ease;
+  
+        &.active {
+          background-color: #4caf50;
+          color: white;
+          font-weight: bold;
+        }
+  
+        &:hover {
+          background-color: #ccc;
+        }
+      }
     }
   }
+  
 
   .recipeList {
     ul {

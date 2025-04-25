@@ -44,10 +44,12 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
     });
   };
 
-  const handleStart = () => {
-    setSelectedRecipe(recipe);
-    navigate("/");
+  const handleStart = async () => {
+    await saveSelectedRecipeId(recipe.id);
+    setSelectedRecipe(recipe); // 🔴 ここで即座にAppの状態を更新
+    navigate("/");             // 🔁 画面遷移
   };
+  
 
   if (!recipe) return <div>読み込み中...</div>;
 

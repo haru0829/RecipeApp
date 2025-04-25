@@ -1,50 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./Home.scss";
 import ProgressCircle from "./ProgressCircle";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Link, useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
-import { updateDoc, doc } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { useRecipeProgress } from "../hooks/useRecipeProgress"; // ✅ 追加
 
 const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
   const navigate = useNavigate();
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [todayTasks, setTodayTasks] = useState([]);
 
-  // ページロード時の処理
+  const {
+    currentStepIndex,
+    setCurrentStepIndex,
+    todayTasks,
+    setTodayTasks,
+    isFinished,
+    setIsFinished,
+    saveProgress,
+  } = useRecipeProgress(selectedRecipe, initialProgress);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-
     if (!isAuth) {
       navigate("/login");
     }
   }, [isAuth, navigate]);
 
-  // レシピと進捗データの初期設定
-  useEffect(() => {
-    if (!selectedRecipe || !Array.isArray(selectedRecipe.steps)) return;
-
-    const progress = initialProgress || {};
-    const stepIndex = progress.currentStep || 0;
-
-    // ステップ範囲外なら0にリセット
-    const safeStepIndex =
-      stepIndex >= selectedRecipe.steps.length ? 0 : stepIndex;
-    setCurrentStepIndex(safeStepIndex);
-
-    const stepTasks = selectedRecipe.steps[safeStepIndex].tasks.map(
-      (task, i) => ({
-        title: task,
-        done: progress.taskStates ? progress.taskStates[i] : false,
-      })
-    );
-
-    setTodayTasks(stepTasks);
-  }, [selectedRecipe, initialProgress]);
-
-  // 現在のステップ情報
   const currentStep = selectedRecipe?.steps?.[currentStepIndex] || {
     title: "",
     tasks: [],
@@ -58,61 +40,50 @@ const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
   const isLastStep =
     currentStepIndex === (selectedRecipe?.steps?.length || 0) - 1;
   const allDone = todayTasks.length > 0 && todayTasks.every((t) => t.done);
+
   const outerPercent = !selectedRecipe
     ? 0
-    : isLastStep && allDone
+    : isFinished
     ? 100
     : Math.floor((currentStepIndex / selectedRecipe.steps.length) * 100);
 
-  // 進捗保存関数
-  const saveProgress = async (stepIndex, taskStates) => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const userRef = doc(db, "users", user.uid);
-    await updateDoc(userRef, {
-      progress: {
-        currentStep: stepIndex,
-        taskStates: taskStates,
-      },
-    });
-  };
-
-  // タスクのチェックを切り替え
   const handleToggle = (index) => {
     const updatedTasks = [...todayTasks];
     updatedTasks[index].done = !updatedTasks[index].done;
     setTodayTasks(updatedTasks);
-
     saveProgress(
       currentStepIndex,
       updatedTasks.map((t) => t.done)
     );
   };
 
-  // 全タスク完了したら次のステップへ
   useEffect(() => {
     if (!selectedRecipe) return;
-    if (allDone && !isLastStep) {
-      setTimeout(() => {
-        const nextStepIndex = currentStepIndex + 1;
-        setCurrentStepIndex(nextStepIndex);
 
-        const nextTasks = selectedRecipe.steps[nextStepIndex].tasks.map(
-          (task) => ({
-            title: task,
-            done: false,
-          })
-        );
+    if (allDone) {
+      if (isLastStep) {
+        setIsFinished(true);
+      } else {
+        setTimeout(() => {
+          const nextStepIndex = currentStepIndex + 1;
+          setCurrentStepIndex(nextStepIndex);
 
-        setTodayTasks(nextTasks);
-        saveProgress(
-          nextStepIndex,
-          nextTasks.map((t) => t.done)
-        );
-      }, 800);
+          const nextTasks = selectedRecipe.steps[nextStepIndex].tasks.map(
+            (task) => ({
+              title: task,
+              done: false,
+            })
+          );
+
+          setTodayTasks(nextTasks);
+          saveProgress(
+            nextStepIndex,
+            nextTasks.map(() => false)
+          );
+        }, 800);
+      }
     }
-  }, [allDone, currentStepIndex, selectedRecipe, isLastStep]);
+  }, [allDone, isLastStep, selectedRecipe]);
 
   return (
     <div className="home">
@@ -154,14 +125,6 @@ const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
             </div>
           </>
         )}
-
-        {/* <div className="homeStreak">
-          <p className="homeStreakTag">連続継続日数</p>
-          <div className="homeStreakVisual">
-            <img src="fire.png" alt="streak" />
-            <p className="homeStreakDate">10日</p>
-          </div>
-        </div> */}
       </div>
 
       <footer>
