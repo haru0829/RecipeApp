@@ -7,9 +7,35 @@ import { Link, useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { updateDoc, doc } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import { getDoc } from "firebase/firestore"; // 既にしていたらOK
 import { addRecipeToFirestore } from "../AddRecipe";
 
 const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!hasRecipe || !auth.currentUser) return;
+  
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) return;
+  
+      const data = userSnap.data();
+      const progress = data.progress?.[selectedRecipe.id];
+      if (!progress) return;
+  
+      const stepIndex = progress.currentStep || 0;
+      setCurrentStepIndex(stepIndex);
+  
+      const stepTasks = selectedRecipe.steps[stepIndex].tasks.map((t, i) => ({
+        title: t,
+        done: progress.taskStates?.[i] || false,
+      }));
+      setTodayTasks(stepTasks);
+    };
+  
+    fetchProgress();
+  }, [selectedRecipe]);
+  
   useEffect(() => {
     console.log("selectedRecipe:", selectedRecipe);
   }, [selectedRecipe]);
