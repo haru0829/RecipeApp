@@ -133,6 +133,9 @@ const Main = ({ selectedRecipe }) => {
             <p className="homeStreakDate">10日</p>
           </div>
         </div>
+        <Link to="/login">
+          <h2>ログイン</h2>
+        </Link>
       </div>
 
       <footer>
