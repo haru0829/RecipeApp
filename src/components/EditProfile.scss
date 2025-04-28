@@ -1,0 +1,82 @@
+.edit-profile {
+
+  &Container {
+    width: 100%;
+    padding: 130px 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  &__avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    overflow: hidden;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 0 auto 20px;
+
+    &-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__input,
+  &__textarea {
+    width: 100%;
+    background-color: #f4f4f4;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 16px;
+    color: #333;
+    resize: none;
+
+    &::placeholder {
+      color: #aaa;
+    }
+  }
+
+  &__error {
+    color: red;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  &__submit {
+    width: 100%;
+    background-color: #6c63ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #5a52d4;
+    }
+
+    &:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  }
+}

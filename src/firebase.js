@@ -1,22 +1,24 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/firestore";
+import "firebase/compat/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyASITXiDvsOsn-OBDBL42d35fAmigO-mYM",
   authDomain: "recipe-912c7.firebaseapp.com",
   projectId: "recipe-912c7",
-  storageBucket: "recipe-912c7.appspot.com", // ✅ Storage使うには storageBucket の設定も必須
-  messagingSenderId: "xxx",
-  appId: "1:107049671392:web:67f8e91db594bbefad0e85",
+  storageBucket: "recipe-912c7.firebasestorage.app",
+  messagingSenderId: "107049671392",
+  appId: "1:107049671392:web:67f8e91db594bbefad0e85"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-const db = getFirestore(app);
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
 
-export const storage = getStorage(app);
+// Export auth, firestore, storage
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-export { auth, provider, db };
+export { auth, provider, db, storage };

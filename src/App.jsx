@@ -16,6 +16,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import UploadRecipes from "./UploadRecipes";
 import UserRegister from "./components/UserRagister";
+import EditProfile from "./components/EditProfile";
 
 
 function App() {
@@ -97,6 +98,7 @@ function App() {
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
         <Route path="/register" element={<UserRegister />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
       </Routes>
     </Router>
   );

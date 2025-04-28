@@ -10,12 +10,23 @@
     .profileIcon {
       width:80px;
       height:80px;
+      object-fit: cover;
       border-radius: 40px;
     }
 
     .profileName {
       font-size: 20px;
     }
+  }
+
+  .editProfileButton {
+    border:none;
+    background-color: #6C63FF;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 20px;
   }
 
   .profileStatsCard {

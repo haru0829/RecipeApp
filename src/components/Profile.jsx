@@ -5,12 +5,21 @@ import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import PersonIcon from "@mui/icons-material/Person";
 import { auth, db } from "../firebase";
-import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [userRecipes, setUserRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -30,7 +39,10 @@ const Profile = () => {
           where("authorId", "==", user.uid)
         );
         const snapshot = await getDocs(q);
-        const recipes = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const recipes = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setUserRecipes(recipes);
       }
       setLoading(false);
@@ -58,8 +70,14 @@ const Profile = () => {
           />
           <h2 className="profileName">{userData.name}</h2>
         </div>
+        <button
+          className="editProfileButton"
+          onClick={() => navigate("/edit-profile")}
+        >
+          プロフィール編集
+        </button>
 
-        {/* 評価・達成数カード */}
+        {/* 評価・達成数カード
         <div className="profileStatsCard">
           <div className="profileStatsItem">
             <p className="profileStatsLabel">レシピ評価</p>
@@ -69,7 +87,7 @@ const Profile = () => {
             <p className="profileStatsLabel">達成ユーザー数</p>
             <p className="profileStatsValue">{userData.successCount || "1,200"}人</p>
           </div>
-        </div>
+        </div> */}
 
         {/* 経歴・実績 */}
         <section className="profileSection">
