@@ -17,7 +17,8 @@ import { auth, db } from "./firebase";
 import UploadRecipes from "./UploadRecipes";
 import UserRegister from "./components/UserRagister";
 import EditProfile from "./components/EditProfile";
-
+import CreateRecipe from "./components/CreateRecipe";
+import EditRecipe from "./components/EditRecipe";
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -99,6 +100,8 @@ function App() {
         <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
         <Route path="/register" element={<UserRegister />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/create-recipe" element={<CreateRecipe />} />
+        <Route path="/edit-recipe/:id" element={<EditRecipe />} />
       </Routes>
     </Router>
   );

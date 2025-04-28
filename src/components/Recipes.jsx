@@ -7,16 +7,15 @@ import { Link } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 
 const Recipes = () => {
-  
   //状態変数定義
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortType, setSortType] = useState("new"); // 'new' または 'popular'
   const [searchTerm, setSearchTerm] = useState("");
   const [recipesLength, setRecipesLength] = useState(0);
-
 
   //全レシピ取得
   useEffect(() => {
@@ -47,17 +46,30 @@ const Recipes = () => {
     const titleMatch = recipe.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const tagMatch = recipe.tag?.some((t) => 
+    const tagMatch = recipe.tag?.some((t) =>
       t.toLowerCase().includes(searchTerm.toLowerCase())
     );
     return titleMatch || tagMatch;
   });
-  
+
   //検索結果件数
   useEffect(() => {
     setRecipesLength(filteredRecipes.length);
   }, [filteredRecipes]);
 
+  //レシピ削除
+  const handleDeleteRecipe = async (recipeId) => {
+    if (window.confirm("本当にこのレシピを削除しますか？")) {
+      try {
+        await deleteDoc(doc(db, "recipes", recipeId));
+        alert("レシピを削除しました！");
+        // 削除後にレシピリストをリロードするならここでfetchする
+      } catch (error) {
+        console.error("レシピ削除エラー:", error);
+        alert("削除に失敗しました。もう一度お試しください。");
+      }
+    }
+  };
 
   return (
     <div className="recipes">
@@ -82,8 +94,8 @@ const Recipes = () => {
           </p>
           <div className="recipeSortButtons">
             <button
-              className={`sortBtn ${sortType === "newest" ? "active" : ""}`}
-              onClick={() => setSortType("newest")}
+              className={`sortBtn ${sortType === "new" ? "active" : ""}`}
+              onClick={() => setSortType("new")}
             >
               新着順
             </button>
@@ -110,6 +122,7 @@ const Recipes = () => {
                         alt=""
                         className="recipeItemImg"
                       />
+
                       <div className="recipeItemContent">
                         <p className="recipeItemTtl">{recipe.title}</p>
                         <p className="recipeItemPps">目的: {recipe.purpose}</p>
@@ -126,7 +139,10 @@ const Recipes = () => {
                     </Link>
 
                     <div className="recipeItemInfo">
-                      <Link to="/profile/:id" className="userLink">
+                      <Link
+                        to={`/profile/${recipe.authorId}`}
+                        className="userLink"
+                      >
                         <div className="userInfo">
                           <img
                             className="userIcon"

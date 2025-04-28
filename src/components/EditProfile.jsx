@@ -104,7 +104,10 @@ const EditProfile = () => {
           onClick={() => fileInputRef.current.click()}
         >
           <img
-            src={previewUrl || "https://knsoza1.com/wp-content/uploads/2020/07/70b3dd52350bf605f1bb4078ef79c9b9.png"}
+            src={
+              previewUrl ||
+              "https://knsoza1.com/wp-content/uploads/2020/07/70b3dd52350bf605f1bb4078ef79c9b9.png"
+            }
             alt="プロフィール画像"
             className="edit-profile__avatar-image"
           />

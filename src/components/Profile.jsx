@@ -120,6 +120,7 @@ const Profile = () => {
             <ul>
               {userRecipes.map((recipe) => (
                 <li className="recipeItem" key={recipe.id}>
+                  
                   <p className="recipeItemTtl">{recipe.title}</p>
                   <p className="recipeItemPps">目的: {recipe.purpose}</p>
                   <p className="recipeItemTime">期間: {recipe.duration}</p>

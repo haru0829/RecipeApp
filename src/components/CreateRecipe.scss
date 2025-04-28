@@ -1,0 +1,207 @@
+.create-recipe {
+  max-width: 500px;
+  margin: 0 auto;
+
+  .header-image {
+    width: 100%;
+    height: 340px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .placeholder {
+      font-size: 16px;
+      color: #aaa;
+    }
+  }
+
+  .content {
+    padding: 16px;
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  // タイトル用input
+  .title-input {
+    background-color: #f4f4f4;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 18px;
+    color: #333;
+    &::placeholder {
+      color: #aaa;
+    }
+  }
+
+  // 期間・人数入力エリア
+  .meta-info {
+    display: flex;
+    gap: 8px;
+
+    input {
+      flex: 1;
+      background-color: #f4f4f4;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      color: #333;
+      &::placeholder {
+        color: #aaa;
+      }
+    }
+  }
+
+  .create-recipe__textarea {
+    background-color: #f4f4f4;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 16px;
+    color: #333;
+    &::placeholder {
+      color: #aaa;
+    }
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 16px 140px;
+  }
+  .step-editor {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0px 5px 15px -5px #777777;
+
+    .step-title {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    // ステップタイトル用input
+    input[type="text"] {
+      background-color: #f4f4f4;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 12px;
+      &::placeholder {
+        color: #aaa;
+      }
+    }
+
+    .task-editor {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+
+      input[type="text"] {
+        flex: 1;
+        background-color: #f4f4f4;
+        border: none;
+        border-radius: 10px;
+        padding: 14px;
+        font-size: 14px;
+        color: #333;
+        &::placeholder {
+          color: #aaa;
+        }
+      }
+    }
+
+    .task-list {
+      padding-left: 20px;
+      font-size: 14px;
+      margin-bottom: 0px;
+
+      .task-item {
+        position: relative;
+        padding-right: 32px; // ボタン分スペース確保
+        font-size: 14px;
+        margin-bottom: 6px;
+
+        .delete-task-btn {
+          position: absolute;
+          right: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          color: #f44336;
+          font-size: 16px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    textarea {
+      background-color: #f4f4f4;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      color: #333;
+      margin-top: 8px;
+    }
+
+    .delete-step-btn {
+      margin-top: 8px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  }
+
+  .add-step-btn {
+    background-color: #6c63ff;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    width: 100%;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .startBtn {
+    padding: 12px 24px;
+    width: 200px;
+    background-color: #6c63ff;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    position: fixed;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    font-weight: 700;
+  }
+}
