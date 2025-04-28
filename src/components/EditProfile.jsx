@@ -89,7 +89,7 @@ const EditProfile = () => {
       { merge: true }
     );
 
-    navigate("/profile");
+    navigate("/profile/1");
   };
 
   return (
