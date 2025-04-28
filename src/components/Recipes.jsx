@@ -9,12 +9,17 @@ import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 const Recipes = () => {
+  
+  //状態変数定義
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortType, setSortType] = useState("new"); // 'new' または 'popular'
+  const [searchTerm, setSearchTerm] = useState("");
+  const [recipesLength, setRecipesLength] = useState(0);
 
+
+  //全レシピ取得
   useEffect(() => {
-    window.scrollTo(0, 0);
     const getRecipes = async () => {
       const snapshot = await getDocs(collection(db, "recipes"));
       const data = snapshot.docs.map((doc) => ({
@@ -27,7 +32,7 @@ const Recipes = () => {
     getRecipes();
   }, []);
 
-  // 🔽 並び替え処理
+  //並び替え処理
   const sortedRecipes = [...recipes].sort((a, b) => {
     if (sortType === "new") {
       return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
@@ -37,6 +42,23 @@ const Recipes = () => {
     return 0;
   });
 
+  //検索処理
+  const filteredRecipes = sortedRecipes.filter((recipe) => {
+    const titleMatch = recipe.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const tagMatch = recipe.tag?.some((t) => 
+      t.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    return titleMatch || tagMatch;
+  });
+  
+  //検索結果件数
+  useEffect(() => {
+    setRecipesLength(filteredRecipes.length);
+  }, [filteredRecipes]);
+
+
   return (
     <div className="recipes">
       <header>
@@ -45,12 +67,17 @@ const Recipes = () => {
 
       <div className="recipeContainer">
         <div className="recipeSearch">
-          <input type="text" placeholder="レシピを検索" />
+          <input
+            type="text"
+            placeholder="レシピを検索"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         <div className="recipeInfo">
           <p className="count">
-            <span className="number">{recipes.length}</span>
+            <span className="number">{recipesLength}</span>
             <span className="unit">件</span>
           </p>
           <div className="recipeSortButtons">
@@ -74,7 +101,7 @@ const Recipes = () => {
             <p>レシピを読み込んでいます...</p>
           ) : (
             <ul>
-              {sortedRecipes.map((recipe) => (
+              {filteredRecipes.map((recipe) => (
                 <li className="recipeItem" key={recipe.id}>
                   <div className="recipeItemWrapper">
                     <Link to={`/recipe-detail/${recipe.id}`}>

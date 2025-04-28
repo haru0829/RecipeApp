@@ -15,6 +15,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import UploadRecipes from "./UploadRecipes";
+import UserRegister from "./components/UserRagister";
+
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -94,6 +96,7 @@ function App() {
         />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
+        <Route path="/register" element={<UserRegister />} />
       </Routes>
     </Router>
   );

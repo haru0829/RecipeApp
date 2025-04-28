@@ -1,94 +1,125 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Profile.scss";
 import { Link } from "react-router-dom";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import PersonIcon from "@mui/icons-material/Person";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 const Profile = () => {
-  const user = auth.currentUser;
+  const [userData, setUserData] = useState(null);
+  const [userRecipes, setUserRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        setUserData(data);
+
+        // そのユーザーが作成したレシピも取得
+        const q = query(
+          collection(db, "recipes"),
+          where("authorId", "==", user.uid)
+        );
+        const snapshot = await getDocs(q);
+        const recipes = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setUserRecipes(recipes);
+      }
+      setLoading(false);
+    };
+
+    fetchUserData();
     window.scrollTo(0, 0);
   }, []);
+
+  if (loading) return <div>読み込み中...</div>;
+  if (!userData) return <div>ユーザーデータがありません。</div>;
 
   return (
     <div className="profile">
       <header>
-        <h1>@{user.displayName}</h1>
+        <h1>@{userData.accountId}</h1>
       </header>
+
       <div className="profileContainer">
         <div className="profileInfo">
           <img
             className="profileIcon"
-            src={user.photoURL}
+            src={userData.profileImage || "/images/defaultIcon.png"}
             alt="プロフィール画像"
           />
-          <h2 className="profileName">{user.displayName}</h2>
+          <h2 className="profileName">{userData.name}</h2>
         </div>
-        {/* <div className="profileStatsCard">
+
+        {/* 評価・達成数カード */}
+        <div className="profileStatsCard">
           <div className="profileStatsItem">
             <p className="profileStatsLabel">レシピ評価</p>
-            <p className="profileStatsValue">★ 4.7</p>
+            <p className="profileStatsValue">★ {userData.rating || "4.7"}</p>
           </div>
           <div className="profileStatsItem">
             <p className="profileStatsLabel">達成ユーザー数</p>
-            <p className="profileStatsValue">1,200人</p>
+            <p className="profileStatsValue">{userData.successCount || "1,200"}人</p>
           </div>
-        </div> */}
+        </div>
+
+        {/* 経歴・実績 */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">経歴・実績</h3>
           <ul className="profileCareerList">
-            <li>・ギター講師歴 7年</li>
-            <li>・バンドサポート経験多数</li>
-            <li>・YouTube / TikTok 合計フォロワー11万人</li>
+            {userData.career?.map((item, index) => (
+              <li key={index}>・{item}</li>
+            ))}
           </ul>
         </section>
+
+        {/* 得意ジャンル */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">得意ジャンル</h3>
           <div className="profileTags">
-            <span className="profileTag">ギター</span>
-            <span className="profileTag">英語</span>
-            <span className="profileTag">基本情報技術者</span>
-            <span className="profileTag">プログラミング</span>
+            {userData.genres?.map((genre, index) => (
+              <span key={index} className="profileTag">
+                {genre}
+              </span>
+            ))}
           </div>
         </section>
 
-        {/* <section className="profileSection">
+        {/* 作成したレシピ */}
+        <section className="profileSection">
           <h3 className="profileSectionTitle">作成したレシピ</h3>
+          {userRecipes.length === 0 ? (
+            <p>作成したレシピはまだありません。</p>
+          ) : (
+            <ul>
+              {userRecipes.map((recipe) => (
+                <li className="recipeItem" key={recipe.id}>
+                  <p className="recipeItemTtl">{recipe.title}</p>
+                  <p className="recipeItemPps">目的: {recipe.purpose}</p>
+                  <p className="recipeItemTime">期間: {recipe.duration}</p>
+                  <p className="recipeItemTag">
+                    {recipe.tag?.map((t, idx) => (
+                      <span key={idx}>#{t} </span>
+                    ))}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-          <ul>
-            <li className="recipeItem">
-              <p className="recipeItemTtl">
-                ギターで簡単なコードを弾けるようになって一曲弾いてみよう
-              </p>
-              <p className="recipeItemPps">目的 : 1曲を弾けるようになる</p>
-              <p className="recipeItemTime">期間 : 2週間</p>
-              <p className="recipeItemTag">
-                #ギター #コード #初心者 #一か月で習得
-              </p>
-            </li>
-            <li className="recipeItem">
-              <p className="recipeItemTtl">
-                ギターで簡単なコードを弾けるようになって一曲弾いてみよう
-              </p>
-              <p className="recipeItemPps">目的 : 1曲を弾けるようになる</p>
-              <p className="recipeItemTime">期間 : 2週間</p>
-              <p className="recipeItemTag">
-                #ギター #コード #初心者 #一か月で習得
-              </p>
-            </li>
-          </ul>
-        </section> */}
-
+        {/* 自己紹介 */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">自己紹介</h3>
-          <p className="profileIntroText">
-            はじめまして、ギター歴20年のリョウです。独学で始め、今ではバンド活動やライブサポートなども行っています。
-            初心者のつまずきポイントや練習方法を分かりやすく伝えるのが得意です。
-            音楽の楽しさを、あなたのペースで一緒に体験していきましょう！
-          </p>
+          <p className="profileIntroText">{userData.bio}</p>
         </section>
       </div>
 
