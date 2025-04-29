@@ -12,12 +12,14 @@
 header {
   padding: 0 30px;
   color: black;
-  background-color: #f2f1f6;
   z-index:1;
+  border-bottom:1px solid black;
 
   h1 {
-    font-size: 22px;
+    font-size: 16px;
     padding-bottom: 16px;
+    text-align: center;
+    background-color: white;
   }
 }
 

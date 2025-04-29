@@ -8,6 +8,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { updateDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
+
 const RecipeDetail = ({ setSelectedRecipe }) => {
   const { id } = useParams();
   const navigate = useNavigate();

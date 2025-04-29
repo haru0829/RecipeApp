@@ -6,6 +6,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { Link, useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { useRecipeProgress } from "../hooks/useRecipeProgress"; // ✅ 追加
+import { auth } from "../firebase";
 
 const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
   const navigate = useNavigate();
@@ -137,7 +138,10 @@ const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
             <DescriptionIcon />
             <p className="footerNavItemText">レシピ</p>
           </Link>
-          <Link to="/profile/:id" className="footerNavItem">
+          <Link
+            to={`/profile/${auth.currentUser?.uid}`}
+            className="footerNavItem"
+          >
             <PersonIcon />
             <p className="footerNavItemText">マイページ</p>
           </Link>

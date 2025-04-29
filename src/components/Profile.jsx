@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "./Profile.scss";
-import { Link } from "react-router-dom";
-import HomeFilledIcon from "@mui/icons-material/HomeFilled";
-import DescriptionIcon from "@mui/icons-material/Description";
-import PersonIcon from "@mui/icons-material/Person";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { auth, db } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth"; // 👈 追加
 import {
   doc,
   getDoc,
@@ -13,48 +10,57 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import HomeFilledIcon from "@mui/icons-material/HomeFilled";
+import DescriptionIcon from "@mui/icons-material/Description";
+import PersonIcon from "@mui/icons-material/Person";
+import "./Profile.scss";
 import "./RecipeCard.scss";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [userRecipes, setUserRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState(null); // 🔥
+
   const navigate = useNavigate();
+  const { id } = useParams(); // URLの:idを取得
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setCurrentUserId(user.uid);
 
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
+        const userIdToFetch = id ? id : user.uid;
+        const userRef = doc(db, "users", userIdToFetch);
+        const userSnap = await getDoc(userRef);
 
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        setUserData(data);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          setUserData(data);
 
-        // そのユーザーが作成したレシピも取得
-        const q = query(
-          collection(db, "recipes"),
-          where("authorId", "==", user.uid)
-        );
-        const snapshot = await getDocs(q);
-        const recipes = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setUserRecipes(recipes);
+          const q = query(
+            collection(db, "recipes"),
+            where("authorId", "==", userIdToFetch)
+          );
+          const snapshot = await getDocs(q);
+          const recipes = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setUserRecipes(recipes);
+        }
       }
       setLoading(false);
-    };
+    });
 
-    fetchUserData();
     window.scrollTo(0, 0);
-  }, []);
+    return () => unsubscribe(); // 🔥クリーンアップ
+  }, [id]); // idが変わるたびに再取得！
 
   if (loading) return <div>読み込み中...</div>;
   if (!userData) return <div>ユーザーデータがありません。</div>;
+
+  const isMyProfile = !id || id === currentUserId;
 
   return (
     <div className="profile">
@@ -71,24 +77,15 @@ const Profile = () => {
           />
           <h2 className="profileName">{userData.name}</h2>
         </div>
-        <button
-          className="editProfileButton"
-          onClick={() => navigate("/edit-profile")}
-        >
-          プロフィール編集
-        </button>
 
-        {/* 評価・達成数カード
-        <div className="profileStatsCard">
-          <div className="profileStatsItem">
-            <p className="profileStatsLabel">レシピ評価</p>
-            <p className="profileStatsValue">★ {userData.rating || "4.7"}</p>
-          </div>
-          <div className="profileStatsItem">
-            <p className="profileStatsLabel">達成ユーザー数</p>
-            <p className="profileStatsValue">{userData.successCount || "1,200"}人</p>
-          </div>
-        </div> */}
+        {isMyProfile && (
+          <button
+            className="editProfileButton"
+            onClick={() => navigate("/edit-profile")}
+          >
+            プロフィール編集
+          </button>
+        )}
 
         {/* 経歴・実績 */}
         <section className="profileSection">
@@ -115,10 +112,10 @@ const Profile = () => {
         {/* 自己紹介 */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">自己紹介</h3>
-          <p className="profileIntroText">{userData.bio}</p>
+          <p className="profileIntroText">{userData.bio || "未設定"}</p>
         </section>
 
-        {/* 作成したレシピ */}
+        {/* 作成レシピ */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">作成したレシピ</h3>
           {userRecipes.length === 0 ? (
@@ -138,8 +135,12 @@ const Profile = () => {
                     />
                     <div className="recipeItemContent">
                       <p className="recipeItemTtl">{recipe.title}</p>
-                      <p className="recipeItemPps">目的: {recipe.purpose}</p>
-                      <p className="recipeItemTime">期間: {recipe.duration}</p>
+                      <p className="recipeItemPps">
+                        目的: {recipe.purpose || "未設定"}
+                      </p>
+                      <p className="recipeItemTime">
+                        期間: {recipe.duration || "未設定"}
+                      </p>
                       <p className="recipeItemTag">
                         {recipe.tag?.map((t, idx) => (
                           <span key={idx}>#{t} </span>
@@ -167,7 +168,10 @@ const Profile = () => {
             <DescriptionIcon />
             <p className="footerNavItemText">レシピ</p>
           </Link>
-          <Link to="/profile/:id" className="footerNavItem active">
+          <Link
+            to={`/profile/${auth.currentUser?.uid}`}
+            className="footerNavItem active"
+          >
             <PersonIcon />
             <p className="footerNavItemText">マイページ</p>
           </Link>
