@@ -136,7 +136,7 @@ const Profile = () => {
                     <div className="recipeItemContent">
                       <p className="recipeItemTtl">{recipe.title}</p>
                       <p className="recipeItemPps">
-                        目的: {recipe.purpose || "未設定"}
+                        目的: {recipe.description || "未設定"}
                       </p>
                       <p className="recipeItemTime">
                         期間: {recipe.duration || "未設定"}

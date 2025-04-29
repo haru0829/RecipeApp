@@ -132,7 +132,7 @@ const Recipes = () => {
 
                       <div className="recipeItemContent">
                         <p className="recipeItemTtl">{recipe.title}</p>
-                        <p className="recipeItemPps">目的: {recipe.purpose}</p>
+                        <p className="recipeItemPps">説明: {recipe.description}</p>
                         <p className="recipeItemTime">
                           期間: {recipe.duration}
                         </p>
