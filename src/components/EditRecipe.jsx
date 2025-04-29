@@ -107,7 +107,7 @@ const EditRecipe = () => {
     });
 
     alert("レシピを更新しました！");
-    navigate("/profile"); // 更新後マイページに戻る
+    navigate("/recipes"); // 更新後マイページに戻る
   };
 
   if (loading) return <div>読み込み中...</div>;

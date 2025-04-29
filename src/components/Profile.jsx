@@ -14,6 +14,7 @@ import {
   where,
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import "./RecipeCard.scss";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -111,34 +112,48 @@ const Profile = () => {
           </div>
         </section>
 
+        {/* 自己紹介 */}
+        <section className="profileSection">
+          <h3 className="profileSectionTitle">自己紹介</h3>
+          <p className="profileIntroText">{userData.bio}</p>
+        </section>
+
         {/* 作成したレシピ */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">作成したレシピ</h3>
           {userRecipes.length === 0 ? (
             <p>作成したレシピはまだありません。</p>
           ) : (
-            <ul>
+            <ul className="profileRecipeList">
               {userRecipes.map((recipe) => (
                 <li className="recipeItem" key={recipe.id}>
-                  
-                  <p className="recipeItemTtl">{recipe.title}</p>
-                  <p className="recipeItemPps">目的: {recipe.purpose}</p>
-                  <p className="recipeItemTime">期間: {recipe.duration}</p>
-                  <p className="recipeItemTag">
-                    {recipe.tag?.map((t, idx) => (
-                      <span key={idx}>#{t} </span>
-                    ))}
-                  </p>
+                  <Link
+                    to={`/recipe-detail/${recipe.id}`}
+                    className="recipeItemWrapper"
+                  >
+                    <img
+                      src={recipe.image || "/images/placeholder.png"}
+                      alt={recipe.title}
+                      className="recipeItemImg"
+                    />
+                    <div className="recipeItemContent">
+                      <p className="recipeItemTtl">{recipe.title}</p>
+                      <p className="recipeItemPps">目的: {recipe.purpose}</p>
+                      <p className="recipeItemTime">期間: {recipe.duration}</p>
+                      <p className="recipeItemTag">
+                        {recipe.tag?.map((t, idx) => (
+                          <span key={idx}>#{t} </span>
+                        ))}
+                      </p>
+                    </div>
+                    <div className="recipeItemInfo">
+                      <p className="recipeStar">★ 4.7</p>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>
           )}
-        </section>
-
-        {/* 自己紹介 */}
-        <section className="profileSection">
-          <h3 className="profileSectionTitle">自己紹介</h3>
-          <p className="profileIntroText">{userData.bio}</p>
         </section>
       </div>
 

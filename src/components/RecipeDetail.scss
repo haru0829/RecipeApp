@@ -29,6 +29,38 @@
     object-fit: cover;
   }
 
+  .btns {
+    position: absolute;
+    display: flex;
+    top:20px;
+    right:10px;
+    gap:6px;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    border:none;
+    padding: 6px 20px;
+    border-radius: 20px;
+    background-color: white;
+    box-shadow: 0px 0px 15px -5px #777777;
+    width:70px;
+    cursor: pointer;
+  }
+
+  .edit-btn:hover {
+      background-color: #6c63ff;
+      color: white;
+      transition: .3s;
+  }
+
+  .delete-btn:hover {
+    background-color: #ff0033;
+    color: white;
+    transition: .3s;
+}
+
+
   .content {
     padding: 16px;
     max-width: 500px;

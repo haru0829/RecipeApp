@@ -8,6 +8,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { deleteDoc, doc } from "firebase/firestore";
+import "./RecipeCard.scss";
+import AddIcon from "@mui/icons-material/Add";
 
 const Recipes = () => {
   //状態変数定義
@@ -78,6 +80,9 @@ const Recipes = () => {
       </header>
 
       <div className="recipeContainer">
+        <Link className="add-btn" to="/create-recipe">
+          <AddIcon />
+        </Link>
         <div className="recipeSearch">
           <input
             type="text"
@@ -146,10 +151,15 @@ const Recipes = () => {
                         <div className="userInfo">
                           <img
                             className="userIcon"
-                            src="/images/userIcon.png"
+                            src={
+                              recipe.authorImage || "/images/defaultIcon.png"
+                            } // 🔥
                             alt="プロフィール画像"
                           />
-                          <h2 className="userName">リョウ</h2>
+                          <h2 className="userName">
+                            {recipe.authorName || "匿名ユーザー"}
+                          </h2>{" "}
+                          {/* 🔥 */}
                         </div>
                       </Link>
                       <p className="recipeStar">★ 4.7</p>

@@ -5,7 +5,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import StairsIcon from "@mui/icons-material/Stairs";
 import PeopleIcon from "@mui/icons-material/People";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { updateDoc, doc, getDoc } from "firebase/firestore";
+import { updateDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const RecipeDetail = ({ setSelectedRecipe }) => {
@@ -13,6 +13,9 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
   const navigate = useNavigate();
 
   const [recipe, setRecipe] = useState(null);
+
+  const user = auth.currentUser;
+  const isMyRecipe = user && recipe && recipe.authorId === user.uid;
 
   // Firestoreから1件のレシピを取得
   useEffect(() => {
@@ -50,6 +53,19 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
     navigate("/"); // 🔁 画面遷移
   };
 
+  const handleDeleteRecipe = async (recipeId) => {
+    if (window.confirm("本当にこのレシピを削除しますか？")) {
+      try {
+        await deleteDoc(doc(db, "recipes", recipeId));
+        alert("レシピを削除しました！");
+        navigate("/recipes");
+      } catch (error) {
+        console.error("レシピ削除エラー:", error);
+        alert("削除に失敗しました。もう一度お試しください。");
+      }
+    }
+  };
+
   if (!recipe) return <div>読み込み中...</div>;
 
   return (
@@ -59,6 +75,24 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
           <ArrowBackIosNewIcon className="back-btn" />
         </Link>
         <img src={recipe.image} alt="レシピヘッダー画像" />
+        <div className="btns">
+          {isMyRecipe && (
+            <div className="btns">
+              <button
+                className="edit-btn"
+                onClick={() => navigate(`/edit-recipe/${recipe.id}`)}
+              >
+                編集
+              </button>
+              <button
+                className="delete-btn"
+                onClick={() => handleDeleteRecipe(recipe.id)}
+              >
+                削除
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="content">
