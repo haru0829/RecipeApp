@@ -6,7 +6,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { Link } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { db } from "../firebase";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, getDoc } from "firebase/firestore";
 import "./RecipeCard.scss";
 import AddIcon from "@mui/icons-material/Add";
 import { auth } from "../firebase";
@@ -25,14 +25,37 @@ const Recipes = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   useEffect(() => {
-    const getRecipes = async () => {
+    const getRecipesWithAuthors = async () => {
       const snapshot = await getDocs(collection(db, "recipes"));
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setRecipes(data);
-      setFilteredRecipes(data);
+      const recipeData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+      const enrichedData = await Promise.all(
+        recipeData.map(async (recipe) => {
+          if (!recipe.authorId) return recipe;
+          try {
+            const userRef = doc(db, "users", recipe.authorId);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              const user = userSnap.data();
+              return {
+                ...recipe,
+                authorName: user.name,
+                authorImage: user.profileImage,
+              };
+            }
+          } catch (err) {
+            console.warn("プロフィール取得失敗:", err);
+          }
+          return recipe;
+        })
+      );
+
+      setRecipes(enrichedData);
+      setFilteredRecipes(enrichedData);
       setLoading(false);
     };
-    getRecipes();
+
+    getRecipesWithAuthors();
   }, []);
 
   const sortedRecipes = [...filteredRecipes].sort((a, b) => {
@@ -45,9 +68,7 @@ const Recipes = () => {
   });
 
   const filteredBySearch = sortedRecipes.filter((recipe) => {
-    const titleMatch = recipe.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+    const titleMatch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
     const tagMatch = recipe.tag?.some((t) =>
       t.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -100,8 +121,7 @@ const Recipes = () => {
           resultCount={
             selectedCategories.length === 0
               ? recipes.length
-              : recipes.filter((r) => selectedCategories.includes(r.category))
-                  .length
+              : recipes.filter((r) => selectedCategories.includes(r.category)).length
           }
         />
       )}
@@ -166,9 +186,7 @@ const Recipes = () => {
                       <div className="recipeItemContent">
                         <p className="recipeItemTtl">{recipe.title}</p>
                         {recipe.category && (
-                          <span
-                            className={`recipeItemCategory category-${recipe.category}`}
-                          >
+                          <span className={`recipeItemCategory category-${recipe.category}`}>
                             {recipe.category}
                           </span>
                         )}
