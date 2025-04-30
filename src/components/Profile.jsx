@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { auth, db } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth"; // 👈 追加
+import { onAuthStateChanged } from "firebase/auth";
 import {
   doc,
   getDoc,
@@ -21,10 +21,11 @@ const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [userRecipes, setUserRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState(null); // 🔥
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [userCounts, setUserCounts] = useState({});
 
   const navigate = useNavigate();
-  const { id } = useParams(); // URLの:idを取得
+  const { id } = useParams();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -49,14 +50,28 @@ const Profile = () => {
             ...doc.data(),
           }));
           setUserRecipes(recipes);
+
+          const usersSnapshot = await getDocs(collection(db, "users"));
+          const counts = {};
+          usersSnapshot.forEach((userDoc) => {
+            const progress = userDoc.data().progress;
+            if (progress) {
+              recipes.forEach((r) => {
+                if (progress[r.id]) {
+                  counts[r.id] = (counts[r.id] || 0) + 1;
+                }
+              });
+            }
+          });
+          setUserCounts(counts);
         }
       }
       setLoading(false);
     });
 
     window.scrollTo(0, 0);
-    return () => unsubscribe(); // 🔥クリーンアップ
-  }, [id]); // idが変わるたびに再取得！
+    return () => unsubscribe();
+  }, [id]);
 
   if (loading) return <LoadingSpinner/>;
   if (!userData) return <div>ユーザーデータがありません。</div>;
@@ -88,7 +103,6 @@ const Profile = () => {
           </button>
         )}
 
-        {/* 経歴・実績 */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">経歴・実績</h3>
           <ul className="profileCareerList">
@@ -98,7 +112,6 @@ const Profile = () => {
           </ul>
         </section>
 
-        {/* 得意ジャンル */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">得意ジャンル</h3>
           <div className="profileTags">
@@ -110,13 +123,11 @@ const Profile = () => {
           </div>
         </section>
 
-        {/* 自己紹介 */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">自己紹介</h3>
           <p className="profileIntroText">{userData.bio || "未設定"}</p>
         </section>
 
-        {/* 作成レシピ */}
         <section className="profileSection">
           <h3 className="profileSectionTitle">作成したレシピ</h3>
           {userRecipes.length === 0 ? (
@@ -141,7 +152,9 @@ const Profile = () => {
                       >
                         {recipe.category}
                       </span>
-
+                      <p className="recipeItemUserCount">
+                        これまでの挑戦者: {userCounts[recipe.id] || 0}人
+                      </p>
                       <p className="recipeItemPps">
                         目的: {recipe.description || "未設定"}
                       </p>
@@ -154,9 +167,6 @@ const Profile = () => {
                         ))}
                       </p>
                     </div>
-                    {/* <div className="recipeItemInfo">
-                      <p className="recipeStar">★ 4.7</p>
-                    </div> */}
                   </Link>
                 </li>
               ))}

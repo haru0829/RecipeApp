@@ -6,7 +6,13 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { Link } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { db } from "../firebase";
-import { collection, getDocs, deleteDoc, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import "./RecipeCard.scss";
 import AddIcon from "@mui/icons-material/Add";
 import { auth } from "../firebase";
@@ -23,11 +29,15 @@ const Recipes = () => {
   const [recipesLength, setRecipesLength] = useState(0);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [userCounts, setUserCounts] = useState({});
 
   useEffect(() => {
     const getRecipesWithAuthors = async () => {
       const snapshot = await getDocs(collection(db, "recipes"));
-      const recipeData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const recipeData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
       const enrichedData = await Promise.all(
         recipeData.map(async (recipe) => {
@@ -53,6 +63,25 @@ const Recipes = () => {
       setRecipes(enrichedData);
       setFilteredRecipes(enrichedData);
       setLoading(false);
+
+      // ユーザー数の取得
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const userCountMap = {};
+
+      usersSnapshot.forEach((userDoc) => {
+        const progress = userDoc.data().progress;
+        if (progress) {
+          Object.keys(progress).forEach((recipeId) => {
+            if (!userCountMap[recipeId]) {
+              userCountMap[recipeId] = 1;
+            } else {
+              userCountMap[recipeId]++;
+            }
+          });
+        }
+      });
+
+      setUserCounts(userCountMap);
     };
 
     getRecipesWithAuthors();
@@ -62,13 +91,15 @@ const Recipes = () => {
     if (sortType === "new") {
       return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
     } else if (sortType === "popular") {
-      return (parseInt(b.people) || 0) - (parseInt(a.people) || 0);
+      return (userCounts[b.id] || 0) - (userCounts[a.id] || 0);
     }
     return 0;
   });
 
   const filteredBySearch = sortedRecipes.filter((recipe) => {
-    const titleMatch = recipe.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const titleMatch = recipe.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const tagMatch = recipe.tag?.some((t) =>
       t.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -121,7 +152,8 @@ const Recipes = () => {
           resultCount={
             selectedCategories.length === 0
               ? recipes.length
-              : recipes.filter((r) => selectedCategories.includes(r.category)).length
+              : recipes.filter((r) => selectedCategories.includes(r.category))
+                  .length
           }
         />
       )}
@@ -186,10 +218,15 @@ const Recipes = () => {
                       <div className="recipeItemContent">
                         <p className="recipeItemTtl">{recipe.title}</p>
                         {recipe.category && (
-                          <span className={`recipeItemCategory category-${recipe.category}`}>
+                          <span
+                            className={`recipeItemCategory category-${recipe.category}`}
+                          >
                             {recipe.category}
                           </span>
                         )}
+                        <p className="recipeItemUserCount">
+                          これまでの挑戦者: {userCounts[recipe.id] || 0}人
+                        </p>
                         <p className="recipeItemPps">
                           説明: {recipe.description}
                         </p>

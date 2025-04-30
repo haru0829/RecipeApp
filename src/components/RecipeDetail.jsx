@@ -5,20 +5,20 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import StairsIcon from "@mui/icons-material/Stairs";
 import PeopleIcon from "@mui/icons-material/People";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { updateDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
+import { updateDoc, doc, getDoc, deleteDoc, getDocs, collection } from "firebase/firestore";
 import { auth, db } from "../firebase";
-import "./RecipeCard.scss"
+import "./RecipeCard.scss";
 
 const RecipeDetail = ({ setSelectedRecipe }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [recipe, setRecipe] = useState(null);
+  const [challengerCount, setChallengerCount] = useState(0);
 
   const user = auth.currentUser;
   const isMyRecipe = user && recipe && recipe.authorId === user.uid;
 
-  // Firestoreから1件のレシピを取得
   useEffect(() => {
     window.scrollTo(0, 0);
     const fetchRecipe = async () => {
@@ -31,7 +31,20 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
       }
     };
 
+    const fetchChallengerCount = async () => {
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      let count = 0;
+      usersSnapshot.forEach((userDoc) => {
+        const progress = userDoc.data().progress;
+        if (progress && Object.keys(progress).includes(id)) {
+          count++;
+        }
+      });
+      setChallengerCount(count);
+    };
+
     fetchRecipe();
+    fetchChallengerCount();
   }, [id]);
 
   const saveSelectedRecipeId = async (recipeId) => {
@@ -50,8 +63,8 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
 
   const handleStart = async () => {
     await saveSelectedRecipeId(recipe.id);
-    setSelectedRecipe(recipe); // 🔴 ここで即座にAppの状態を更新
-    navigate("/"); // 🔁 画面遷移
+    setSelectedRecipe(recipe);
+    navigate("/");
   };
 
   const handleDeleteRecipe = async (recipeId) => {
@@ -109,7 +122,7 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
           <StairsIcon />
           <span>{recipe.steps.length}ステップ</span>
           <PeopleIcon />
-          <span>{recipe.people}人</span>
+          <span>挑戦者: {challengerCount}人</span>
         </div>
         <p className="desc">{recipe.description}</p>
       </div>
