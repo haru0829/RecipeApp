@@ -19,6 +19,7 @@ import UserRegister from "./components/UserRagister";
 import EditProfile from "./components/EditProfile";
 import CreateRecipe from "./components/CreateRecipe";
 import EditRecipe from "./components/EditRecipe";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -71,7 +72,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner/>;
 
   return (
     <Router>
