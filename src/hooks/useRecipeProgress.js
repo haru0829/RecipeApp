@@ -3,15 +3,15 @@ import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export const useRecipeProgress = (selectedRecipe, initialProgress) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(null);
   const [todayTasks, setTodayTasks] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
     if (!selectedRecipe || !Array.isArray(selectedRecipe.steps)) return;
 
-    const progress = initialProgress?.[selectedRecipe.id] || {};
-    const stepIndex = progress.currentStep || 0;
+    const progressData = initialProgress?.[selectedRecipe.id] || {};
+    const stepIndex = progressData.currentStep || 0;
     const safeStepIndex =
       stepIndex >= selectedRecipe.steps.length ? 0 : stepIndex;
 
@@ -20,7 +20,8 @@ export const useRecipeProgress = (selectedRecipe, initialProgress) => {
     const stepTasks = selectedRecipe.steps[safeStepIndex].tasks.map(
       (task, i) => ({
         title: task,
-        done: progress.taskStates ? progress.taskStates[i] : false,
+        done: progressData.taskStates ? progressData.taskStates[i] : false,
+        note: progressData.taskNotes ? progressData.taskNotes[i] : "",
       })
     );
     setTodayTasks(stepTasks);
@@ -33,18 +34,30 @@ export const useRecipeProgress = (selectedRecipe, initialProgress) => {
     }
   }, [selectedRecipe, initialProgress]);
 
-  const saveProgress = async (stepIndex, taskStates) => {
+  const saveProgress = async (stepIndex, taskStates, taskNotes) => {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user || !selectedRecipe?.id) return;
+
     const cleanedTaskStates = taskStates.map((t) => !!t);
+    const cleanedTaskNotes = taskNotes || [];
+
     const userRef = doc(db, "users", user.uid);
-    await updateDoc(userRef, {
-      progress: {
-        [selectedRecipe.id]: {
-          currentStep: stepIndex,
-          taskStates: cleanedTaskStates,
-        },
+    const userSnap = await getDoc(userRef);
+    const currentProgress = userSnap.exists()
+      ? userSnap.data().progress || {}
+      : {};
+
+    const updatedProgress = {
+      ...currentProgress,
+      [selectedRecipe.id]: {
+        currentStep: stepIndex,
+        taskStates: cleanedTaskStates,
+        taskNotes: cleanedTaskNotes,
       },
+    };
+
+    await updateDoc(userRef, {
+      progress: updatedProgress,
     });
   };
 

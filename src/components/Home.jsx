@@ -1,15 +1,49 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Home.scss";
 import ProgressCircle from "./ProgressCircle";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Link, useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
-import { useRecipeProgress } from "../hooks/useRecipeProgress"; // ✅ 追加
-import { auth } from "../firebase";
+import { useRecipeProgress } from "../hooks/useRecipeProgress";
+import { auth, db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 
-const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
+const Main = ({ selectedRecipe, isAuth }) => {
   const navigate = useNavigate();
+
+  const [initialProgress, setInitialProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [progressLoaded, setProgressLoaded] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!selectedRecipe || !auth.currentUser) {
+        setLoading(false); // ← これも忘れずに
+        return;
+      }
+
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setInitialProgress(data.progress || {});
+      }
+
+      setProgressLoaded(true);
+      setLoading(false); // ✅ ここを忘れていた！
+    };
+
+    fetchProgress();
+  }, [selectedRecipe]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (!isAuth) {
+      navigate("/login");
+    }
+  }, [isAuth, navigate]);
 
   const {
     currentStepIndex,
@@ -19,14 +53,10 @@ const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
     isFinished,
     setIsFinished,
     saveProgress,
-  } = useRecipeProgress(selectedRecipe, initialProgress);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (!isAuth) {
-      navigate("/login");
-    }
-  }, [isAuth, navigate]);
+  } = useRecipeProgress(
+    selectedRecipe,
+    progressLoaded ? initialProgress : null
+  );
 
   const currentStep = selectedRecipe?.steps?.[currentStepIndex] || {
     title: "",
@@ -64,6 +94,7 @@ const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
     if (allDone) {
       if (isLastStep) {
         setIsFinished(true);
+        setShowCompletionModal(true); // ✅ モーダル表示
       } else {
         setTimeout(() => {
           const nextStepIndex = currentStepIndex + 1;
@@ -86,8 +117,35 @@ const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
     }
   }, [allDone, isLastStep, selectedRecipe]);
 
+  if (loading) return <p>読み込み中...</p>;
+
+  const handleNoteChange = (index, newNote) => {
+    const updatedTasks = [...todayTasks];
+    updatedTasks[index].note = newNote;
+    setTodayTasks(updatedTasks);
+
+    // 保存処理：完了状態とノートの両方
+    saveProgress(
+      currentStepIndex,
+      updatedTasks.map((t) => t.done),
+      updatedTasks.map((t) => t.note)
+    );
+  };
+
   return (
     <div className="home">
+      {showCompletionModal && (
+        <div className="completionModal">
+          <div className="completionModalContent">
+            <h2>🎉 完了！</h2>
+            <p>このレシピをすべて達成しました！</p>
+            <button onClick={() => setShowCompletionModal(false)}>
+              閉じる
+            </button>
+          </div>
+        </div>
+      )}
+
       <header>
         <h1>あなたの進捗状況</h1>
       </header>
@@ -110,16 +168,23 @@ const Main = ({ selectedRecipe, isAuth, initialProgress }) => {
             </div>
 
             <div className="homeTask">
-              <p className="homeTaskTag">本日のタスク</p>
+              <p className="homeTaskTag">タスク</p>
               <ul className="homeTaskList">
                 {todayTasks.map((task, i) => (
-                  <li
-                    key={i}
-                    className="homeTaskItem"
-                    onClick={() => handleToggle(i)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    {task.done ? "☑" : "☐"} {task.title}
+                  <li key={i} className="homeTaskItem">
+                    <div
+                      onClick={() => handleToggle(i)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      {task.done ? "☑" : "☐"} {task.title}
+                    </div>
+
+                    <textarea
+                      className="taskNote"
+                      placeholder="今日やる範囲やメモを記入..."
+                      value={task.note || ""}
+                      onChange={(e) => handleNoteChange(i, e.target.value)}
+                    />
                   </li>
                 ))}
               </ul>
