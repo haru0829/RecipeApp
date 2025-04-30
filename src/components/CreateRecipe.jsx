@@ -4,6 +4,7 @@ import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import "./CreateRecipe.scss";
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
 const CreateRecipe = () => {
   const [title, setTitle] = useState("");
@@ -163,6 +164,7 @@ const CreateRecipe = () => {
   return (
     <>
       <header>
+        <ArrowBackIosNewIcon className="back-btn"/>
         <h1>投稿</h1>
       </header>
       <div className="create-recipe">
