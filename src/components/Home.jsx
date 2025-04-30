@@ -90,23 +90,29 @@ const Main = ({ selectedRecipe, isAuth }) => {
 
   useEffect(() => {
     if (!selectedRecipe) return;
-
+  
+    const completedKey = `completed-${selectedRecipe.id}`;
+    const alreadyShown = sessionStorage.getItem(completedKey);
+  
     if (allDone) {
       if (isLastStep) {
-        setIsFinished(true);
-        setShowCompletionModal(true); // ✅ モーダル表示
+        if (!alreadyShown) {
+          setIsFinished(true);
+          setShowCompletionModal(true);
+          sessionStorage.setItem(completedKey, "true"); // 🔒 表示済みフラグ保存
+        }
       } else {
         setTimeout(() => {
           const nextStepIndex = currentStepIndex + 1;
           setCurrentStepIndex(nextStepIndex);
-
+  
           const nextTasks = selectedRecipe.steps[nextStepIndex].tasks.map(
             (task) => ({
               title: task,
               done: false,
             })
           );
-
+  
           setTodayTasks(nextTasks);
           saveProgress(
             nextStepIndex,
@@ -116,6 +122,7 @@ const Main = ({ selectedRecipe, isAuth }) => {
       }
     }
   }, [allDone, isLastStep, selectedRecipe]);
+  
 
   if (loading) return <p>読み込み中...</p>;
 
