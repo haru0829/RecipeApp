@@ -7,7 +7,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { updateDoc, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
-
+import "./RecipeCard.scss"
 
 const RecipeDetail = ({ setSelectedRecipe }) => {
   const { id } = useParams();
@@ -98,6 +98,11 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
 
       <div className="content">
         <h1>{recipe.title}</h1>
+        {recipe.category && (
+          <span className={`recipeItemCategory category-${recipe.category}`}>
+            {recipe.category}
+          </span>
+        )}
         <div className="meta">
           <AccessTimeIcon />
           <span>{recipe.duration}</span>

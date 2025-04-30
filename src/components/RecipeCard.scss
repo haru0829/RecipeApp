@@ -21,6 +21,7 @@
     line-height: 20px;
     margin-bottom: 4px;
   }
+
   &Pps,
   &Time,
   &Tag {
@@ -48,6 +49,9 @@
 
       .userIcon {
         width: 40px;
+        height:40px;
+        object-fit: cover;
+        border-radius: 20px;
       }
       .userName {
         font-size: 14px;
@@ -64,4 +68,24 @@
 a {
   text-decoration: none;
   color: inherit;
+}
+
+
+//カテゴリ
+.recipeItemCategory {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.category-運動・ボディメイク {
+  border: 1px solid #66bb6a;
+  color: #66bb6a;
+}
+
+.category-プログラミング {
+  border: 1px solid #6f47c0;
+  color: #6f47c0;
 }

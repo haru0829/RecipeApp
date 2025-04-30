@@ -47,6 +47,77 @@
     }
   }
 
+  .categorySelector {
+    margin-top: 20px;
+
+    .sectionTitle {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .categoryOptions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .categoryChip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1.5px solid #ccc;
+      background-color: white;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.selected {
+        border-color: #6c63ff;
+        color: #6c63ff;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .tagInputWrapper {
+    margin-top: 20px;
+  
+    input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+  
+    .tagList {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  
+    .tagChip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      background-color: #f3f3f3;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #333;
+  
+      .deleteTag {
+        margin-left: 6px;
+        border: none;
+        background: none;
+        color: #999;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    }
+  }
+  
+
   // 期間・人数入力エリア
   .meta-info {
     display: flex;

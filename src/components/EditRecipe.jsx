@@ -14,9 +14,24 @@ const EditRecipe = () => {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [steps, setSteps] = useState([]);
+  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState("");
   const fileInputRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
+
+  const categoryOptions = [
+    "楽器",
+    "語学",
+    "運動・ボディメイク",
+    "プログラミング",
+    "趣味・創作",
+    "資格",
+    "旅行・アウトドア",
+    "ゲーム",
+    "投資",
+  ];
 
   // レシピの初期データ取得
   useEffect(() => {
@@ -31,6 +46,8 @@ const EditRecipe = () => {
           setDescription(data.description || "");
           setImageUrl(data.image || "");
           setSteps(data.steps || []);
+          setCategory(data.category || "");
+          setTags(data.tag || []);
         }
       } catch (error) {
         console.error("レシピ取得エラー:", error);
@@ -92,8 +109,26 @@ const EditRecipe = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    if (!title.trim() || !duration.trim() || !description.trim() || steps.length === 0) {
-      alert("すべての必須項目を入力してください。");
+    if (
+      !title.trim() ||
+      !duration.trim() ||
+      !description.trim() ||
+      !category.trim() ||
+      steps.length === 0
+    ) {
+      alert(
+        "すべての必須項目（タイトル・期間・説明・カテゴリ・ステップ）を入力してください。"
+      );
+      return;
+    }
+
+    const emptyStepIndex = steps.findIndex(
+      (step) => !step.title.trim() || step.tasks.length === 0
+    );
+    if (emptyStepIndex !== -1) {
+      alert(
+        `ステップ ${emptyStepIndex + 1} にタイトルまたはタスクがありません。`
+      );
       return;
     }
 
@@ -104,124 +139,194 @@ const EditRecipe = () => {
       description,
       image: imageUrl,
       steps,
+      category,
+      tag: tags,
     });
 
     alert("レシピを更新しました！");
-    navigate("/recipes"); // 更新後マイページに戻る
+    navigate("/recipes");
   };
 
   if (loading) return <div>読み込み中...</div>;
 
   return (
-    <div className="create-recipe">
-      <div className="header-image" onClick={() => fileInputRef.current.click()}>
-        {imageUrl ? <img src={imageUrl} alt="レシピ画像" /> : <div className="placeholder">画像をアップロード</div>}
-      </div>
-      <input
-        type="file"
-        accept="image/*"
-        ref={fileInputRef}
-        onChange={handleImageChange}
-        style={{ display: "none" }}
-      />
-
-      <div className="content">
+    <>
+      <header>
+        <h1>編集</h1>
+      </header>
+      <div className="create-recipe">
+        <div
+          className="header-image"
+          onClick={() => fileInputRef.current.click()}
+        >
+          {imageUrl ? (
+            <img src={imageUrl} alt="レシピ画像" />
+          ) : (
+            <div className="placeholder">画像をアップロード</div>
+          )}
+        </div>
         <input
-          className="create-recipe__input title-input"
-          type="text"
-          placeholder="レシピタイトル"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+          style={{ display: "none" }}
         />
-        <div className="meta-info">
+
+        <div className="content">
           <input
-            className="create-recipe__input"
+            className="create-recipe__input title-input"
             type="text"
-            placeholder="期間（例: 3ヶ月）"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
+            placeholder="レシピタイトル"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             required
           />
-        </div>
-        <textarea
-          className="create-recipe__textarea"
-          placeholder="レシピの説明"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="steps">
-        <h2>ステップ</h2>
-
-        {steps.map((step, index) => (
-          <div key={index} className="step-editor">
+          <div className="meta-info">
             <input
               className="create-recipe__input"
               type="text"
-              placeholder="ステップタイトル"
-              value={step.title}
-              onChange={(e) => handleStepTitleChange(index, e.target.value)}
+              placeholder="期間（例: 3ヶ月）"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              required
             />
+          </div>
+          <textarea
+            className="create-recipe__textarea"
+            placeholder="レシピの説明"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
 
-            <div className="task-editor">
+          {/* カテゴリ選択 */}
+          <div className="categorySelector">
+            <p className="sectionTitle">カテゴリ</p>
+            <div className="categoryOptions">
+              {categoryOptions.map((cat) => (
+                <button
+                  key={cat}
+                  className={`categoryChip ${
+                    category === cat ? "selected" : ""
+                  }`}
+                  onClick={() => setCategory(cat)}
+                  type="button"
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* タグ入力 */}
+          <div className="tagInputWrapper">
+            <label>タグ（自由入力・Enterで追加）</label>
+            <input
+              type="text"
+              placeholder="例: 習慣化"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && tagInput.trim() !== "") {
+                  e.preventDefault();
+                  if (!tags.includes(tagInput.trim())) {
+                    setTags([...tags, tagInput.trim()]);
+                  }
+                  setTagInput("");
+                }
+              }}
+            />
+            <div className="tagList">
+              {tags.map((tag, index) => (
+                <span className="tagChip" key={index}>
+                  #{tag}
+                  <button
+                    className="deleteTag"
+                    onClick={() => setTags(tags.filter((t) => t !== tag))}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="steps">
+          <h2>ステップ</h2>
+
+          {steps.map((step, index) => (
+            <div key={index} className="step-editor">
               <input
                 className="create-recipe__input"
                 type="text"
-                placeholder="タスクを追加"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddTask(index, e.target.value);
-                    e.target.value = "";
-                  }
-                }}
+                placeholder="ステップタイトル"
+                value={step.title}
+                onChange={(e) => handleStepTitleChange(index, e.target.value)}
               />
+
+              <div className="task-editor">
+                <input
+                  className="create-recipe__input"
+                  type="text"
+                  placeholder="タスクを追加"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddTask(index, e.target.value);
+                      e.target.value = "";
+                    }
+                  }}
+                />
+              </div>
+
+              <ul className="task-list">
+                {step.tasks.map((task, i) => (
+                  <li key={i} className="task-item">
+                    {task}
+                    <button
+                      type="button"
+                      className="delete-task-btn"
+                      onClick={() => handleDeleteTask(index, i)}
+                    >
+                      ✖
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <textarea
+                className="create-recipe__textarea"
+                placeholder="補足・ポイント（任意）"
+                value={step.point}
+                onChange={(e) => handlePointChange(index, e.target.value)}
+              />
+
+              <button
+                type="button"
+                className="delete-step-btn"
+                onClick={() => handleDeleteStep(index)}
+              >
+                ステップを削除
+              </button>
             </div>
+          ))}
 
-            <ul className="task-list">
-              {step.tasks.map((task, i) => (
-                <li key={i} className="task-item">
-                  {task}
-                  <button
-                    type="button"
-                    className="delete-task-btn"
-                    onClick={() => handleDeleteTask(index, i)}
-                  >
-                    ✖
-                  </button>
-                </li>
-              ))}
-            </ul>
+          <button
+            type="button"
+            className="add-step-btn"
+            onClick={handleAddStep}
+          >
+            ＋ ステップを追加
+          </button>
+        </div>
 
-            <textarea
-              className="create-recipe__textarea"
-              placeholder="補足・ポイント（任意）"
-              value={step.point}
-              onChange={(e) => handlePointChange(index, e.target.value)}
-            />
-
-            <button
-              type="button"
-              className="delete-step-btn"
-              onClick={() => handleDeleteStep(index)}
-            >
-              ステップを削除
-            </button>
-          </div>
-        ))}
-
-        <button type="button" className="add-step-btn" onClick={handleAddStep}>
-          ＋ ステップを追加
+        <button className="startBtn" type="submit" onClick={handleUpdate}>
+          更新する
         </button>
       </div>
-
-      <button className="startBtn" type="submit" onClick={handleUpdate}>
-        更新する
-      </button>
-    </div>
+    </>
   );
 };
 

@@ -12,13 +12,17 @@ const CreateRecipe = () => {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [steps, setSteps] = useState([]);
-  const [userData, setUserData] = useState(null); // 🔥追加
+  const [category, setCategory] = useState("");
+  const [tagInput, setTagInput] = useState(""); 
+  const [tags, setTags] = useState([]);          
+  const [userData, setUserData] = useState(null);
 
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
   // 🔥 ユーザーデータを取得（名前とアイコン用）
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchUserData = async () => {
       const user = auth.currentUser;
       if (!user) return;
@@ -46,8 +50,29 @@ const CreateRecipe = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const user = auth.currentUser;
-    if (!user || !userData) return; // 🔥 userData必須
-
+    if (!user || !userData) return;
+  
+    // 必須項目のバリデーション
+    if (
+      !title.trim() ||
+      !duration.trim() ||
+      !description.trim() ||
+      steps.length === 0 ||
+      !category.trim()
+    ) {
+      alert("すべての必須項目（タイトル、期間、説明、カテゴリ、ステップ）を入力してください。");
+      return;
+    }
+  
+    // ステップが1つ以上あるが、タスクが空のものがないかチェック
+    const emptyStepIndex = steps.findIndex(
+      (step) => !step.title.trim() || step.tasks.length === 0
+    );
+    if (emptyStepIndex !== -1) {
+      alert(`ステップ ${emptyStepIndex + 1} にタイトルまたはタスクがありません。`);
+      return;
+    }
+  
     const newRecipe = {
       title,
       duration,
@@ -55,15 +80,18 @@ const CreateRecipe = () => {
       description,
       image: imageUrl,
       steps,
+      category,
+      tag: tags,
       authorId: user.uid,
-      authorName: userData.name, // 🔥追加
-      authorImage: userData.profileImage, // 🔥追加
+      authorName: userData.name,
+      authorImage: userData.profileImage,
       createdAt: new Date(),
     };
-
+  
     await addDoc(collection(db, "recipes"), newRecipe);
     navigate("/recipes");
   };
+  
   // ステップのタイトルを変更
   const handleStepTitleChange = (index, value) => {
     const updatedSteps = [...steps];
@@ -109,6 +137,19 @@ const CreateRecipe = () => {
     };
     setSteps([...steps, newStep]);
   };
+
+  //カテゴリ
+  const categoryOptions = [
+    "楽器",
+    "語学",
+    "運動・ボディメイク",
+    "プログラミング",
+    "趣味・創作",
+    "資格",
+    "旅行・アウトドア",
+    "ゲーム",
+    "投資",
+  ];
 
   return (
     <>
@@ -165,6 +206,59 @@ const CreateRecipe = () => {
             required
           />
         </div>
+
+        <div className="categorySelector">
+            <p className="sectionTitle">カテゴリ</p>
+            <div className="categoryOptions">
+              {categoryOptions.map((cat) => (
+                <button
+                  key={cat}
+                  className={`categoryChip ${
+                    category === cat ? "selected" : ""
+                  }`}
+                  onClick={() => setCategory(cat)}
+                  type="button"
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="tagInputWrapper">
+            <label>タグ（自由入力・Enterで追加）</label>
+            <input
+              type="text"
+              placeholder="例: 習慣化"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && tagInput.trim() !== "") {
+                  e.preventDefault();
+                  if (!tags.includes(tagInput.trim())) {
+                    setTags([...tags, tagInput.trim()]);
+                  }
+                  setTagInput("");
+                }
+              }}
+            />
+
+            <div className="tagList">
+              {tags.map((tag, index) => (
+                <span className="tagChip" key={index}>
+                  #{tag}
+                  <button
+                    className="deleteTag"
+                    onClick={() => {
+                      setTags(tags.filter((t) => t !== tag));
+                    }}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
 
         {/* ステップ作成 */}
         <div className="steps">

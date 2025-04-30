@@ -12,7 +12,6 @@ import "./RecipeCard.scss";
 import AddIcon from "@mui/icons-material/Add";
 import { auth } from "../firebase";
 
-
 const Recipes = () => {
   //状態変数定義
   const [recipes, setRecipes] = useState([]);
@@ -132,7 +131,17 @@ const Recipes = () => {
 
                       <div className="recipeItemContent">
                         <p className="recipeItemTtl">{recipe.title}</p>
-                        <p className="recipeItemPps">説明: {recipe.description}</p>
+                        {recipe.category && (
+                          <span
+                            className={`recipeItemCategory category-${recipe.category}`}
+                          >
+                            {recipe.category}
+                          </span>
+                        )}
+
+                        <p className="recipeItemPps">
+                          説明: {recipe.description}
+                        </p>
                         <p className="recipeItemTime">
                           期間: {recipe.duration}
                         </p>
@@ -162,7 +171,7 @@ const Recipes = () => {
                         </div>
                       </Link>
 
-                      <p className="recipeStar">★ 4.7</p>
+                      {/* <p className="recipeStar">★ 4.7</p> */}
                     </div>
                   </div>
                 </li>
