@@ -13,8 +13,8 @@ const CreateRecipe = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [steps, setSteps] = useState([]);
   const [category, setCategory] = useState("");
-  const [tagInput, setTagInput] = useState(""); 
-  const [tags, setTags] = useState([]);          
+  const [tagInput, setTagInput] = useState("");
+  const [tags, setTags] = useState([]);
   const [userData, setUserData] = useState(null);
 
   const fileInputRef = useRef(null);
@@ -51,7 +51,7 @@ const CreateRecipe = () => {
     e.preventDefault();
     const user = auth.currentUser;
     if (!user || !userData) return;
-  
+
     // 必須項目のバリデーション
     if (
       !title.trim() ||
@@ -60,19 +60,23 @@ const CreateRecipe = () => {
       steps.length === 0 ||
       !category.trim()
     ) {
-      alert("すべての必須項目（タイトル、期間、説明、カテゴリ、ステップ）を入力してください。");
+      alert(
+        "すべての必須項目（タイトル、期間、説明、カテゴリ、ステップ）を入力してください。"
+      );
       return;
     }
-  
+
     // ステップが1つ以上あるが、タスクが空のものがないかチェック
     const emptyStepIndex = steps.findIndex(
       (step) => !step.title.trim() || step.tasks.length === 0
     );
     if (emptyStepIndex !== -1) {
-      alert(`ステップ ${emptyStepIndex + 1} にタイトルまたはタスクがありません。`);
+      alert(
+        `ステップ ${emptyStepIndex + 1} にタイトルまたはタスクがありません。`
+      );
       return;
     }
-  
+
     const newRecipe = {
       title,
       duration,
@@ -87,11 +91,11 @@ const CreateRecipe = () => {
       authorImage: userData.profileImage,
       createdAt: new Date(),
     };
-  
+
     await addDoc(collection(db, "recipes"), newRecipe);
     navigate("/recipes");
   };
-  
+
   // ステップのタイトルを変更
   const handleStepTitleChange = (index, value) => {
     const updatedSteps = [...steps];
@@ -205,60 +209,58 @@ const CreateRecipe = () => {
             onChange={(e) => setDescription(e.target.value)}
             required
           />
+           <div className="categorySelector">
+          <p className="sectionTitle">カテゴリ</p>
+          <div className="categoryOptions">
+            {categoryOptions.map((cat) => (
+              <button
+                key={cat}
+                className={`categoryChip ${category === cat ? "selected" : ""}`}
+                onClick={() => setCategory(cat)}
+                type="button"
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="categorySelector">
-            <p className="sectionTitle">カテゴリ</p>
-            <div className="categoryOptions">
-              {categoryOptions.map((cat) => (
-                <button
-                  key={cat}
-                  className={`categoryChip ${
-                    category === cat ? "selected" : ""
-                  }`}
-                  onClick={() => setCategory(cat)}
-                  type="button"
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="tagInputWrapper">
-            <label>タグ（自由入力・Enterで追加）</label>
-            <input
-              type="text"
-              placeholder="例: 習慣化"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && tagInput.trim() !== "") {
-                  e.preventDefault();
-                  if (!tags.includes(tagInput.trim())) {
-                    setTags([...tags, tagInput.trim()]);
-                  }
-                  setTagInput("");
+        <div className="tagInputWrapper">
+          <label>タグ（自由入力・Enterで追加）</label>
+          <input
+            type="text"
+            placeholder="例: 習慣化"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && tagInput.trim() !== "") {
+                e.preventDefault();
+                if (!tags.includes(tagInput.trim())) {
+                  setTags([...tags, tagInput.trim()]);
                 }
-              }}
-            />
+                setTagInput("");
+              }
+            }}
+          />
 
-            <div className="tagList">
-              {tags.map((tag, index) => (
-                <span className="tagChip" key={index}>
-                  #{tag}
-                  <button
-                    className="deleteTag"
-                    onClick={() => {
-                      setTags(tags.filter((t) => t !== tag));
-                    }}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
+          <div className="tagList">
+            {tags.map((tag, index) => (
+              <span className="tagChip" key={index}>
+                #{tag}
+                <button
+                  className="deleteTag"
+                  onClick={() => {
+                    setTags(tags.filter((t) => t !== tag));
+                  }}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
           </div>
+        </div>
+        </div>
+
 
         {/* ステップ作成 */}
         <div className="steps">
