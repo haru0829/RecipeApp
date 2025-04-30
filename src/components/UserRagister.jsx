@@ -5,6 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import "./UserRegister.scss";
 
+
 const UserRegistration = () => {
   const [name, setName] = useState("");
   const [accountId, setAccountId] = useState("");
@@ -88,7 +89,7 @@ const UserRegistration = () => {
       successCount: 0,
     });
 
-    navigate("/");
+    navigate("/recipes");
   };
 
   return (

@@ -89,7 +89,7 @@ const EditProfile = () => {
       { merge: true }
     );
 
-    navigate("/profile/1");
+    navigate(`/profile/${auth.currentUser?.uid}`);
   };
 
   return (
@@ -125,7 +125,7 @@ const EditProfile = () => {
           <input
             className="edit-profile__input"
             type="text"
-            placeholder="ニックネーム"
+            placeholder="名前"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -133,7 +133,7 @@ const EditProfile = () => {
           <input
             className="edit-profile__input"
             type="text"
-            placeholder="ユーザーネーム"
+            placeholder="アカウントID"
             value={accountId}
             onChange={handleAccountIdChange}
           />
