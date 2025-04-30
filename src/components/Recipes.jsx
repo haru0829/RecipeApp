@@ -1,41 +1,40 @@
+// Recipes.jsx
 import React, { useEffect, useState } from "react";
 import "./Recipes.scss";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
 import HomeFilledIcon from "@mui/icons-material/HomeFilled";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { Link } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import { db } from "../firebase";
-import { collection, getDocs } from "firebase/firestore";
-import { deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import "./RecipeCard.scss";
 import AddIcon from "@mui/icons-material/Add";
 import { auth } from "../firebase";
+import CategoryFilterModal from "./CategoryFilterModal";
+import TuneIcon from '@mui/icons-material/Tune';
 
 const Recipes = () => {
-  //状態変数定義
   const [recipes, setRecipes] = useState([]);
+  const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortType, setSortType] = useState("new"); // 'new' または 'popular'
+  const [sortType, setSortType] = useState("new");
   const [searchTerm, setSearchTerm] = useState("");
   const [recipesLength, setRecipesLength] = useState(0);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
-  //全レシピ取得
   useEffect(() => {
     const getRecipes = async () => {
       const snapshot = await getDocs(collection(db, "recipes"));
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setRecipes(data);
+      setFilteredRecipes(data);
       setLoading(false);
     };
     getRecipes();
   }, []);
 
-  //並び替え処理
-  const sortedRecipes = [...recipes].sort((a, b) => {
+  const sortedRecipes = [...filteredRecipes].sort((a, b) => {
     if (sortType === "new") {
       return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
     } else if (sortType === "popular") {
@@ -44,8 +43,7 @@ const Recipes = () => {
     return 0;
   });
 
-  //検索処理
-  const filteredRecipes = sortedRecipes.filter((recipe) => {
+  const filteredBySearch = sortedRecipes.filter((recipe) => {
     const titleMatch = recipe.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -55,18 +53,15 @@ const Recipes = () => {
     return titleMatch || tagMatch;
   });
 
-  //検索結果件数
   useEffect(() => {
-    setRecipesLength(filteredRecipes.length);
-  }, [filteredRecipes]);
+    setRecipesLength(filteredBySearch.length);
+  }, [filteredBySearch]);
 
-  //レシピ削除
   const handleDeleteRecipe = async (recipeId) => {
     if (window.confirm("本当にこのレシピを削除しますか？")) {
       try {
         await deleteDoc(doc(db, "recipes", recipeId));
         alert("レシピを削除しました！");
-        // 削除後にレシピリストをリロードするならここでfetchする
       } catch (error) {
         console.error("レシピ削除エラー:", error);
         alert("削除に失敗しました。もう一度お試しください。");
@@ -74,16 +69,44 @@ const Recipes = () => {
     }
   };
 
+  const toggleCategory = (cat) => {
+    setSelectedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
+  };
+
+  const handleApply = () => {
+    if (selectedCategories.length === 0) {
+      setFilteredRecipes(recipes);
+    } else {
+      const result = recipes.filter((r) =>
+        selectedCategories.includes(r.category)
+      );
+      setFilteredRecipes(result);
+    }
+    setIsFilterOpen(false);
+  };
+
   return (
     <div className="recipes">
+      {isFilterOpen && (
+        <CategoryFilterModal
+          selectedCategories={selectedCategories}
+          onToggleCategory={toggleCategory}
+          onClear={() => setSelectedCategories([])}
+          onApply={handleApply}
+          onClose={() => setIsFilterOpen(false)}
+          resultCount={
+            selectedCategories.length === 0
+              ? recipes.length
+              : recipes.filter((r) => selectedCategories.includes(r.category))
+                  .length
+          }
+        />
+      )}
+
       <header>
         <h1>みんなのレシピ</h1>
-      </header>
-
-      <div className="recipeContainer">
-        <Link className="add-btn" to="/create-recipe">
-          <AddIcon />
-        </Link>
         <div className="recipeSearch">
           <input
             type="text"
@@ -91,7 +114,14 @@ const Recipes = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <button onClick={() => setIsFilterOpen(true)}><TuneIcon/></button>
         </div>
+      </header>
+
+      <div className="recipeContainer">
+        <Link className="add-btn" to="/create-recipe">
+          <AddIcon />
+        </Link>
 
         <div className="recipeInfo">
           <p className="count">
@@ -119,16 +149,17 @@ const Recipes = () => {
             <p>レシピを読み込んでいます...</p>
           ) : (
             <ul>
-              {filteredRecipes.map((recipe) => (
+              {filteredBySearch.map((recipe) => (
                 <li className="recipeItem" key={recipe.id}>
                   <div className="recipeItemWrapper">
                     <Link to={`/recipe-detail/${recipe.id}`}>
-                      <img
-                        src={recipe.image}
-                        alt=""
-                        className="recipeItemImg"
-                      />
-
+                      {recipe.image && (
+                        <img
+                          src={recipe.image}
+                          alt=""
+                          className="recipeItemImg"
+                        />
+                      )}
                       <div className="recipeItemContent">
                         <p className="recipeItemTtl">{recipe.title}</p>
                         {recipe.category && (
@@ -138,7 +169,6 @@ const Recipes = () => {
                             {recipe.category}
                           </span>
                         )}
-
                         <p className="recipeItemPps">
                           説明: {recipe.description}
                         </p>
@@ -153,7 +183,6 @@ const Recipes = () => {
                         </p>
                       </div>
                     </Link>
-
                     <div className="recipeItemInfo">
                       <Link
                         to={`/profile/${recipe.authorId}`}
@@ -170,8 +199,6 @@ const Recipes = () => {
                           <h2 className="userName">{recipe.authorName}</h2>
                         </div>
                       </Link>
-
-                      {/* <p className="recipeStar">★ 4.7</p> */}
                     </div>
                   </div>
                 </li>
@@ -195,7 +222,6 @@ const Recipes = () => {
             to={`/profile/${auth.currentUser?.uid}`}
             className="footerNavItem"
           >
-            {" "}
             <PersonIcon />
             <p className="footerNavItemText">マイページ</p>
           </Link>

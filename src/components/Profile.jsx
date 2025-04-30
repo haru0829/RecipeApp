@@ -135,13 +135,12 @@ const Profile = () => {
                     />
                     <div className="recipeItemContent">
                       <p className="recipeItemTtl">{recipe.title}</p>
-                      {recipe.category && (
-                        <span
-                          className={`recipeItemCategory category-${recipe.category}`}
-                        >
-                          {recipe.category}
-                        </span>
-                      )}
+                      <span
+                        className={`recipeItemCategory category-${recipe.category}`}
+                      >
+                        {recipe.category}
+                      </span>
+
                       <p className="recipeItemPps">
                         目的: {recipe.description || "未設定"}
                       </p>

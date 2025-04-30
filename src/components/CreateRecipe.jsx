@@ -146,14 +146,19 @@ const CreateRecipe = () => {
   const categoryOptions = [
     "楽器",
     "語学",
-    "運動・ボディメイク",
+    "運動・ボディメイク	",
     "プログラミング",
+    "資格・学習",
+    "ビジネススキル",
     "趣味・創作",
-    "資格",
     "旅行・アウトドア",
     "ゲーム",
-    "投資",
+    "投資・お金",
+    "習慣化チャレンジ",
+    "生活スキル・家事", 
+    "美容・セルフケア"
   ];
+  
 
   return (
     <>
@@ -209,58 +214,59 @@ const CreateRecipe = () => {
             onChange={(e) => setDescription(e.target.value)}
             required
           />
-           <div className="categorySelector">
-          <p className="sectionTitle">カテゴリ</p>
-          <div className="categoryOptions">
-            {categoryOptions.map((cat) => (
-              <button
-                key={cat}
-                className={`categoryChip ${category === cat ? "selected" : ""}`}
-                onClick={() => setCategory(cat)}
-                type="button"
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="tagInputWrapper">
-          <label>タグ（自由入力・Enterで追加）</label>
-          <input
-            type="text"
-            placeholder="例: 習慣化"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && tagInput.trim() !== "") {
-                e.preventDefault();
-                if (!tags.includes(tagInput.trim())) {
-                  setTags([...tags, tagInput.trim()]);
-                }
-                setTagInput("");
-              }
-            }}
-          />
-
-          <div className="tagList">
-            {tags.map((tag, index) => (
-              <span className="tagChip" key={index}>
-                #{tag}
+          <div className="categorySelector">
+            <p className="sectionTitle">カテゴリ</p>
+            <div className="categoryOptions">
+              {categoryOptions.map((cat) => (
                 <button
-                  className="deleteTag"
-                  onClick={() => {
-                    setTags(tags.filter((t) => t !== tag));
-                  }}
+                  key={cat}
+                  className={`categoryChip ${
+                    category === cat ? "selected" : ""
+                  }`}
+                  onClick={() => setCategory(cat)}
+                  type="button"
                 >
-                  ×
+                  {cat}
                 </button>
-              </span>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          <div className="tagInputWrapper">
+            <label>タグ（自由入力・Enterで追加）</label>
+            <input
+              type="text"
+              placeholder="例: 習慣化"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && tagInput.trim() !== "") {
+                  e.preventDefault();
+                  if (!tags.includes(tagInput.trim())) {
+                    setTags([...tags, tagInput.trim()]);
+                  }
+                  setTagInput("");
+                }
+              }}
+            />
+
+            <div className="tagList">
+              {tags.map((tag, index) => (
+                <span className="tagChip" key={index}>
+                  #{tag}
+                  <button
+                    className="deleteTag"
+                    onClick={() => {
+                      setTags(tags.filter((t) => t !== tag));
+                    }}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-        </div>
-
 
         {/* ステップ作成 */}
         <div className="steps">
