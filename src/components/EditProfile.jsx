@@ -4,6 +4,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import "./EditProfile.scss";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 const EditProfile = () => {
   const [name, setName] = useState("");
@@ -93,9 +94,14 @@ const EditProfile = () => {
     navigate(`/profile/${auth.currentUser?.uid}`);
   };
 
+  const handleBack = () => {
+    navigate(-1); // ← ブラウザ履歴で一つ前に戻る
+  };
+
   return (
     <div className="edit-profile">
       <header>
+        <ArrowBackIosNewIcon className="back-btn" onClick={handleBack} />
         <h1 className="edit-profile__title">プロフィール編集</h1>
       </header>
 

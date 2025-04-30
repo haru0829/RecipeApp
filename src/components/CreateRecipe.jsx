@@ -4,7 +4,7 @@ import { collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import "./CreateRecipe.scss";
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 const CreateRecipe = () => {
   const [title, setTitle] = useState("");
@@ -156,15 +156,18 @@ const CreateRecipe = () => {
     "ゲーム",
     "投資・お金",
     "習慣化チャレンジ",
-    "生活スキル・家事", 
-    "美容・セルフケア"
+    "生活スキル・家事",
+    "美容・セルフケア",
   ];
-  
+
+  const handleBack = () => {
+    navigate(-1); // ← ブラウザ履歴で一つ前に戻る
+  };
 
   return (
     <>
       <header>
-        <ArrowBackIosNewIcon className="back-btn"/>
+        <ArrowBackIosNewIcon className="back-btn" onClick={handleBack}/>
         <h1>投稿</h1>
       </header>
       <div className="create-recipe">

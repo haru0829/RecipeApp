@@ -4,6 +4,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate, useParams } from "react-router-dom";
 import "./CreateRecipe.scss"; // CreateRecipeのスタイルを流用
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
 const EditRecipe = () => {
   const { id } = useParams(); // URLパラメータからレシピID取得
@@ -34,10 +35,9 @@ const EditRecipe = () => {
     "ゲーム",
     "投資・お金",
     "習慣化チャレンジ",
-    "生活スキル・家事", 
-    "美容・セルフケア"
+    "生活スキル・家事",
+    "美容・セルフケア",
   ];
-  
 
   // レシピの初期データ取得
   useEffect(() => {
@@ -155,9 +155,14 @@ const EditRecipe = () => {
 
   if (loading) return <div>読み込み中...</div>;
 
+  const handleBack = () => {
+    navigate(-1); // ← ブラウザ履歴で一つ前に戻る
+  };
+
   return (
     <>
       <header>
+        <ArrowBackIosNewIcon className="back-btn" onClick={handleBack} />
         <h1>編集</h1>
       </header>
       <div className="create-recipe">
