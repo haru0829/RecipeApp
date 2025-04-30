@@ -11,7 +11,8 @@ import "./RecipeCard.scss";
 import AddIcon from "@mui/icons-material/Add";
 import { auth } from "../firebase";
 import CategoryFilterModal from "./CategoryFilterModal";
-import TuneIcon from '@mui/icons-material/Tune';
+import TuneIcon from "@mui/icons-material/Tune";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Recipes = () => {
   const [recipes, setRecipes] = useState([]);
@@ -114,7 +115,9 @@ const Recipes = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button onClick={() => setIsFilterOpen(true)}><TuneIcon/></button>
+          <button onClick={() => setIsFilterOpen(true)}>
+            <TuneIcon />
+          </button>
         </div>
       </header>
 
@@ -146,7 +149,7 @@ const Recipes = () => {
 
         <div className="recipeList">
           {loading ? (
-            <p>レシピを読み込んでいます...</p>
+            <LoadingSpinner />
           ) : (
             <ul>
               {filteredBySearch.map((recipe) => (

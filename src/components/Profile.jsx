@@ -15,6 +15,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import PersonIcon from "@mui/icons-material/Person";
 import "./Profile.scss";
 import "./RecipeCard.scss";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -57,7 +58,7 @@ const Profile = () => {
     return () => unsubscribe(); // 🔥クリーンアップ
   }, [id]); // idが変わるたびに再取得！
 
-  if (loading) return <div>読み込み中...</div>;
+  if (loading) return <LoadingSpinner/>;
   if (!userData) return <div>ユーザーデータがありません。</div>;
 
   const isMyProfile = !id || id === currentUserId;
