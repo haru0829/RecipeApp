@@ -20,7 +20,7 @@ const Main = ({ selectedRecipe, isAuth }) => {
   useEffect(() => {
     const fetchProgress = async () => {
       if (!selectedRecipe || !auth.currentUser) {
-        setLoading(false); // ← これも忘れずに
+        setLoading(false);
         return;
       }
 
@@ -32,7 +32,7 @@ const Main = ({ selectedRecipe, isAuth }) => {
       }
 
       setProgressLoaded(true);
-      setLoading(false); // ✅ ここを忘れていた！
+      setLoading(false);
     };
 
     fetchProgress();
@@ -70,7 +70,6 @@ const Main = ({ selectedRecipe, isAuth }) => {
 
   const isLastStep =
     currentStepIndex === (selectedRecipe?.steps?.length || 0) - 1;
-  const allDone = todayTasks.length > 0 && todayTasks.every((t) => t.done);
 
   const outerPercent = !selectedRecipe
     ? 0
@@ -78,41 +77,30 @@ const Main = ({ selectedRecipe, isAuth }) => {
     ? 100
     : Math.floor((currentStepIndex / selectedRecipe.steps.length) * 100);
 
-  const handleToggle = (index) => {
-    const updatedTasks = [...todayTasks];
-    updatedTasks[index].done = !updatedTasks[index].done;
-    setTodayTasks(updatedTasks);
-    saveProgress(
-      currentStepIndex,
-      updatedTasks.map((t) => t.done)
-    );
-  };
-
-  useEffect(() => {
-    if (!selectedRecipe) return;
-  
+  const checkStepCompletion = (taskList) => {
     const completedKey = `completed-${selectedRecipe.id}`;
     const alreadyShown = sessionStorage.getItem(completedKey);
-  
-    if (allDone) {
+    const allDoneNow = taskList.length > 0 && taskList.every((t) => t.done);
+
+    if (allDoneNow) {
       if (isLastStep) {
         if (!alreadyShown) {
           setIsFinished(true);
           setShowCompletionModal(true);
-          sessionStorage.setItem(completedKey, "true"); // 🔒 表示済みフラグ保存
+          sessionStorage.setItem(completedKey, "true");
         }
       } else {
         setTimeout(() => {
           const nextStepIndex = currentStepIndex + 1;
           setCurrentStepIndex(nextStepIndex);
-  
+
           const nextTasks = selectedRecipe.steps[nextStepIndex].tasks.map(
             (task) => ({
               title: task,
               done: false,
             })
           );
-  
+
           setTodayTasks(nextTasks);
           saveProgress(
             nextStepIndex,
@@ -121,23 +109,30 @@ const Main = ({ selectedRecipe, isAuth }) => {
         }, 800);
       }
     }
-  }, [allDone, isLastStep, selectedRecipe]);
-  
+  };
 
-  if (loading) return <p>読み込み中...</p>;
+  const handleToggle = (index) => {
+    const updatedTasks = [...todayTasks];
+    updatedTasks[index].done = !updatedTasks[index].done;
+    setTodayTasks(updatedTasks);
+    saveProgress(
+      currentStepIndex,
+      updatedTasks.map((t) => t.done)
+    ).then(() => checkStepCompletion(updatedTasks));
+  };
 
   const handleNoteChange = (index, newNote) => {
     const updatedTasks = [...todayTasks];
     updatedTasks[index].note = newNote;
     setTodayTasks(updatedTasks);
-
-    // 保存処理：完了状態とノートの両方
     saveProgress(
       currentStepIndex,
       updatedTasks.map((t) => t.done),
       updatedTasks.map((t) => t.note)
     );
   };
+
+  if (loading) return <p>読み込み中...</p>;
 
   return (
     <div className="home">
@@ -185,7 +180,6 @@ const Main = ({ selectedRecipe, isAuth }) => {
                     >
                       {task.done ? "☑" : "☐"} {task.title}
                     </div>
-
                     <textarea
                       className="taskNote"
                       placeholder="今日やる範囲やメモを記入..."

@@ -291,7 +291,7 @@ const CreateRecipe = () => {
                 <input
                   className="create-recipe__input"
                   type="text"
-                  placeholder="タスクを追加"
+                  placeholder="タスクを追加（Enterで追加）"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();

@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-
 export const useRecipeProgress = (selectedRecipe, initialProgress) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(null);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [todayTasks, setTodayTasks] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
     if (!selectedRecipe || !Array.isArray(selectedRecipe.steps)) return;
 
-    const progressData = initialProgress?.[selectedRecipe.id] || {};
-    const stepIndex = progressData.currentStep || 0;
+    const progress = initialProgress?.[selectedRecipe.id] || {};
+    const stepIndex = progress.currentStep || 0;
     const safeStepIndex =
       stepIndex >= selectedRecipe.steps.length ? 0 : stepIndex;
 
@@ -20,8 +19,8 @@ export const useRecipeProgress = (selectedRecipe, initialProgress) => {
     const stepTasks = selectedRecipe.steps[safeStepIndex].tasks.map(
       (task, i) => ({
         title: task,
-        done: progressData.taskStates ? progressData.taskStates[i] : false,
-        note: progressData.taskNotes ? progressData.taskNotes[i] : "",
+        done: progress.taskStates ? progress.taskStates[i] : false,
+        note: progress.taskNotes ? progress.taskNotes[i] : "",
       })
     );
     setTodayTasks(stepTasks);
@@ -30,34 +29,34 @@ export const useRecipeProgress = (selectedRecipe, initialProgress) => {
       safeStepIndex === selectedRecipe.steps.length - 1 &&
       stepTasks.every((t) => t.done)
     ) {
-      setIsFinished(true);
+      setIsFinished(true); // 🔥 初期状態で完了している場合も反映
     }
   }, [selectedRecipe, initialProgress]);
 
-  const saveProgress = async (stepIndex, taskStates, taskNotes) => {
+  const saveProgress = async (stepIndex, taskStates, taskNotes = []) => {
     const user = auth.currentUser;
     if (!user || !selectedRecipe?.id) return;
 
     const cleanedTaskStates = taskStates.map((t) => !!t);
-    const cleanedTaskNotes = taskNotes || [];
+    const cleanedTaskNotes = taskNotes.map((n) => n || "");
 
     const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-    const currentProgress = userSnap.exists()
-      ? userSnap.data().progress || {}
-      : {};
-
-    const updatedProgress = {
-      ...currentProgress,
-      [selectedRecipe.id]: {
-        currentStep: stepIndex,
-        taskStates: cleanedTaskStates,
-        taskNotes: cleanedTaskNotes,
-      },
+    const currentProgress = {
+      currentStep: stepIndex,
+      taskStates: cleanedTaskStates,
+      taskNotes: cleanedTaskNotes,
     };
 
+    // 自分自身の状態にも保存
+    if (
+      stepIndex === selectedRecipe.steps.length - 1 &&
+      cleanedTaskStates.every((t) => t)
+    ) {
+      setIsFinished(true); // 🔥 リアルタイム反映
+    }
+
     await updateDoc(userRef, {
-      progress: updatedProgress,
+      [`progress.${selectedRecipe.id}`]: currentProgress,
     });
   };
 
