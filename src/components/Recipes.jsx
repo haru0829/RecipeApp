@@ -19,6 +19,8 @@ import { auth } from "../firebase";
 import CategoryFilterModal from "./CategoryFilterModal";
 import TuneIcon from "@mui/icons-material/Tune";
 import LoadingSpinner from "./LoadingSpinner";
+import LikeButton from "./LikeButton";
+import { onAuthStateChanged } from "firebase/auth";
 
 const Recipes = () => {
   const [recipes, setRecipes] = useState([]);
@@ -30,6 +32,16 @@ const Recipes = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [userCounts, setUserCounts] = useState({});
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUserId(user.uid);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const getRecipesWithAuthors = async () => {
@@ -217,6 +229,7 @@ const Recipes = () => {
                       )}
                       <div className="recipeItemContent">
                         <p className="recipeItemTtl">{recipe.title}</p>
+
                         {recipe.category && (
                           <span
                             className={`recipeItemCategory category-${recipe.category}`}
@@ -257,6 +270,11 @@ const Recipes = () => {
                           <h2 className="userName">{recipe.authorName}</h2>
                         </div>
                       </Link>
+                      <LikeButton
+                        recipeId={recipe.id}
+                        userId={currentUserId}
+                        initialCount={recipe.likeCount}
+                      />
                     </div>
                   </div>
                 </li>

@@ -8,6 +8,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import { useRecipeProgress } from "../hooks/useRecipeProgress";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+
 
 const Main = ({ selectedRecipe, isAuth }) => {
   const navigate = useNavigate();
@@ -39,11 +41,24 @@ const Main = ({ selectedRecipe, isAuth }) => {
   }, [selectedRecipe]);
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/login");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+  
+  useEffect(() => {
     window.scrollTo(0, 0);
-    if (!isAuth) {
-      navigate("/login");
-    }
-  }, [isAuth, navigate]);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/login");
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
+  
 
   const {
     currentStepIndex,

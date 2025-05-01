@@ -1,0 +1,12 @@
+.likeButton {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #ff4d4d;
+  
+    &.liked {
+      color: #ff0000;
+    }
+  }
+  

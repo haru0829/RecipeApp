@@ -4,7 +4,8 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate, useParams } from "react-router-dom";
 import "./CreateRecipe.scss"; // CreateRecipeのスタイルを流用
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import { onAuthStateChanged } from "firebase/auth";
 
 const EditRecipe = () => {
   const { id } = useParams(); // URLパラメータからレシピID取得
@@ -63,6 +64,15 @@ const EditRecipe = () => {
     };
     fetchRecipe();
   }, [id]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/login");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   // 画像変更
   const handleImageChange = async (e) => {

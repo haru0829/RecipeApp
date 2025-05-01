@@ -5,6 +5,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import "./CreateRecipe.scss";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import { onAuthStateChanged } from "firebase/auth";
+
 
 const CreateRecipe = () => {
   const [title, setTitle] = useState("");
@@ -36,6 +38,17 @@ const CreateRecipe = () => {
     };
     fetchUserData();
   }, []);
+
+  
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          navigate("/login");
+        }
+      });
+      return () => unsubscribe();
+    }, []);
+    
 
   // ヘッダー画像アップロード
   const handleImageChange = async (e) => {

@@ -5,9 +5,19 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import StairsIcon from "@mui/icons-material/Stairs";
 import PeopleIcon from "@mui/icons-material/People";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { updateDoc, doc, getDoc, deleteDoc, getDocs, collection } from "firebase/firestore";
+import {
+  updateDoc,
+  doc,
+  getDoc,
+  deleteDoc,
+  getDocs,
+  collection,
+} from "firebase/firestore";
 import { auth, db } from "../firebase";
 import "./RecipeCard.scss";
+import { onAuthStateChanged } from "firebase/auth";
+import LoadingSpinner from "./LoadingSpinner";
+import LikeButton from "./LikeButton";
 
 const RecipeDetail = ({ setSelectedRecipe }) => {
   const { id } = useParams();
@@ -15,9 +25,19 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
 
   const [recipe, setRecipe] = useState(null);
   const [challengerCount, setChallengerCount] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const user = auth.currentUser;
   const isMyRecipe = user && recipe && recipe.authorId === user.uid;
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/login");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -46,6 +66,13 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
     fetchRecipe();
     fetchChallengerCount();
   }, [id]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) setCurrentUserId(user.uid);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const saveSelectedRecipeId = async (recipeId) => {
     const user = auth.currentUser;
@@ -80,7 +107,7 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
     }
   };
 
-  if (!recipe) return <div>読み込み中...</div>;
+  if (!recipe) return <LoadingSpinner />;
 
   return (
     <div className="recipeDetail">
@@ -111,11 +138,19 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
 
       <div className="content">
         <h1>{recipe.title}</h1>
-        {recipe.category && (
-          <span className={`recipeItemCategory category-${recipe.category}`}>
-            {recipe.category}
-          </span>
-        )}
+        <div className="recipeInfo">
+          {recipe.category && (
+            <span className={`recipeItemCategory category-${recipe.category}`}>
+              {recipe.category}
+            </span>
+          )}
+          <LikeButton
+            recipeId={recipe.id}
+            userId={currentUserId}
+            initialCount={recipe.likeCount}
+          />
+        </div>
+
         <div className="meta">
           <AccessTimeIcon />
           <span>{recipe.duration}</span>

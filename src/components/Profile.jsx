@@ -16,6 +16,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import "./Profile.scss";
 import "./RecipeCard.scss";
 import LoadingSpinner from "./LoadingSpinner";
+import LikeButton from "./LikeButton"; // ← LikeButton の追加もOK
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -26,6 +27,15 @@ const Profile = () => {
 
   const navigate = useNavigate();
   const { id } = useParams();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/login");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -73,7 +83,7 @@ const Profile = () => {
     return () => unsubscribe();
   }, [id]);
 
-  if (loading) return <LoadingSpinner/>;
+  if (loading) return <LoadingSpinner />;
   if (!userData) return <div>ユーザーデータがありません。</div>;
 
   const isMyProfile = !id || id === currentUserId;
@@ -147,6 +157,7 @@ const Profile = () => {
                     />
                     <div className="recipeItemContent">
                       <p className="recipeItemTtl">{recipe.title}</p>
+
                       <span
                         className={`recipeItemCategory category-${recipe.category}`}
                       >
@@ -168,6 +179,26 @@ const Profile = () => {
                       </p>
                     </div>
                   </Link>
+                  <div className="recipeItemInfo">
+                    <Link
+                      to={`/profile/${recipe.authorId}`}
+                      className="userLink"
+                    >
+                      {/* <div className="userInfo">
+                        <img
+                          className="userIcon"
+                          src={recipe.authorImage || "/images/defaultIcon.png"}
+                          alt="プロフィール画像"
+                        />
+                        <h2 className="userName">{recipe.authorName}</h2>
+                      </div> */}
+                    </Link>
+                    <LikeButton
+                      recipeId={recipe.id}
+                      userId={currentUserId}
+                      initialCount={recipe.likeCount}
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
