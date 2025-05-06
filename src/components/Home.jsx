@@ -10,7 +10,6 @@ import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
-
 const Main = ({ selectedRecipe, isAuth }) => {
   const navigate = useNavigate();
 

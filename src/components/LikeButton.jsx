@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { doc, getDoc, setDoc, deleteDoc, updateDoc, increment } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+  increment,
+} from "firebase/firestore";
 import { db } from "../firebase"; // firebase 初期化済みの db を import
-import "./LikeButton.scss"
+import "./LikeButton.scss";
+import { auth } from "../firebase";
 
-const LikeButton = ({ recipeId, userId, initialLiked = false, initialCount = 0 }) => {
+
+const LikeButton = ({
+  recipeId,
+  userId,
+  initialLiked = false,
+  initialCount = 0,
+}) => {
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialCount);
 
@@ -23,6 +37,9 @@ const LikeButton = ({ recipeId, userId, initialLiked = false, initialCount = 0 }
   }, [recipeId, userId]);
 
   const toggleLike = async () => {
+    console.log("auth.currentUser?.uid:", auth.currentUser?.uid);
+    console.log("userId:", userId);
+
     if (!userId) {
       alert("ログインしてください");
       return;
@@ -39,7 +56,7 @@ const LikeButton = ({ recipeId, userId, initialLiked = false, initialCount = 0 }
       setLiked(false);
       setLikeCount((prev) => prev - 1);
     } else {
-      await setDoc(likeRef, { liked: true });
+      await setDoc(likeRef, { liked: true }, { merge: true });
       await updateDoc(recipeRef, {
         likeCount: increment(1),
       });
