@@ -21,6 +21,7 @@ import TuneIcon from "@mui/icons-material/Tune";
 import LoadingSpinner from "./LoadingSpinner";
 import { onAuthStateChanged } from "firebase/auth";
 
+
 const Recipes = () => {
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
