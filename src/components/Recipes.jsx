@@ -19,7 +19,6 @@ import { auth } from "../firebase";
 import CategoryFilterModal from "./CategoryFilterModal";
 import TuneIcon from "@mui/icons-material/Tune";
 import LoadingSpinner from "./LoadingSpinner";
-import LikeButton from "./LikeButton";
 import { onAuthStateChanged } from "firebase/auth";
 
 const Recipes = () => {
@@ -270,11 +269,6 @@ const Recipes = () => {
                           <h2 className="userName">{recipe.authorName}</h2>
                         </div>
                       </Link>
-                      <LikeButton
-                        recipeId={recipe.id}
-                        userId={currentUserId}
-                        initialCount={recipe.likeCount}
-                      />
                     </div>
                   </div>
                 </li>

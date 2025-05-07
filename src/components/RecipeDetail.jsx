@@ -17,7 +17,6 @@ import { auth, db } from "../firebase";
 import "./RecipeCard.scss";
 import { onAuthStateChanged } from "firebase/auth";
 import LoadingSpinner from "./LoadingSpinner";
-import LikeButton from "./LikeButton";
 
 const RecipeDetail = ({ setSelectedRecipe }) => {
   const { id } = useParams();
@@ -144,11 +143,6 @@ const RecipeDetail = ({ setSelectedRecipe }) => {
               {recipe.category}
             </span>
           )}
-          <LikeButton
-            recipeId={recipe.id}
-            userId={currentUserId}
-            initialCount={recipe.likeCount}
-          />
         </div>
 
         <div className="meta">

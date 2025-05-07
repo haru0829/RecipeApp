@@ -16,7 +16,6 @@ import PersonIcon from "@mui/icons-material/Person";
 import "./Profile.scss";
 import "./RecipeCard.scss";
 import LoadingSpinner from "./LoadingSpinner";
-import LikeButton from "./LikeButton"; // ← LikeButton の追加もOK
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -193,11 +192,6 @@ const Profile = () => {
                         <h2 className="userName">{recipe.authorName}</h2>
                       </div> */}
                     </Link>
-                    <LikeButton
-                      recipeId={recipe.id}
-                      userId={currentUserId}
-                      initialCount={recipe.likeCount}
-                    />
                   </div>
                 </li>
               ))}
